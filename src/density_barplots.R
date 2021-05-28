@@ -1,11 +1,11 @@
-########## BIOL 499 PROJECT DENSITY BARPLOTS ##########
+########## SURVEY COMPARISON PROJECT DENSITY BARPLOTS ##########
 ########## 
 ##########
 # This file creates barplots of the density differences between survey types. 
 ##########
 ##########
 # AUTHOR: Iris M. George
-# DATE OF CREATION: 2021-05-25
+# DATE OF CREATION: 2021-05-28
 ##########
 ##########
 
@@ -235,19 +235,16 @@ SVCpred_bar[is.na(SVCpred_bar)] <- 0
 SVCpred_bar <- SVCpred_bar[SVCpred_bar$species !=0,]
 
 
-# Remove Single-Order Species ==================================================
+# Remove Problem Species ==================================================
 
 # The following removes single-order species from the dataframes as these 
 # species were not used in analyses.
 
-# remove silversides and trumpetfish from SVC vs. transect data
-SVCprey_family <- SVCprey_family[c(1:2,5:38),]
+# remove silversides, trumpetfish, eels, and flounder from SVC vs. transect data
+SVCprey_family <- SVCprey_family[c(1:2,5:6,8:24,27:38),] 
 
-# remove trumpetfish from SVC vs. roving data
-SVCpred_bar <- SVCpred_bar[c(1:23),]
-
-# remove eels from SVC vs. transect data
-SVCprey_family <- SVCprey_family[c()]
+# remove trumpetfish, gray snapper, and amberjack from SVC vs. roving data
+SVCpred_bar <- SVCpred_bar[c(2:8,10:23),]
 
 
 # Density Difference Barplots ==================================================
@@ -280,7 +277,7 @@ SVCpred_barplot <- ggplot(data=SVCpred_bar, aes(x=species, y=avg_density_dif)) +
   theme(axis.text= element_text(size = 14)) +
   theme(legend.text = element_text(size = 18)) +
   theme(legend.title = element_text(size = 20)) +
-  ylim(-0.03, 0.13)
+  ylim(-0.005, 0.008)
 SVCpred_barplot + coord_flip() +
   geom_hline(yintercept = 0,
              linetype = "dashed",
@@ -295,7 +292,7 @@ SVCpred_barplot + coord_flip() +
 # surveys and across species between SVC and roving surveys. 
 
 # SVC vs. transect survey barplot
-SVCprey_error_barplot <- ggplot(data=SVCprey_family_nosilversides, 
+SVCprey_error_barplot <- ggplot(data=SVCprey_family, 
                                 aes(x=family, y=avg_density_dif)) +
   geom_bar(stat="identity", fill="blue") +
   theme_classic() + xlab("Family") + 

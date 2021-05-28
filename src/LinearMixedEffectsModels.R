@@ -1,18 +1,22 @@
-########## Survey Comparison: Linear Mixed Effects Models ##########
+########## SURVEY COMPARISON PROJECT MODEL TROUBLESHOOTING ##########
+########## 
+##########
+# This file creates linear mixed effects models to compare fish density 
+# differences between SVC and transect surveys and SVC and roving surveys using 
+# species, habitat, and survey traits as predictors. It creates numerous models
+# each of which use a different combination of traits in order to determine the 
+# most appropriate global models to use in further model selection. 
+##########
+##########
+# AUTHOR: Iris M. George
+# DATE OF CREATION: 2021-05-28
+##########
+##########
 
 
-#### Set Up ####
+# Set-Up =======================================================================
 
-setwd("/Users/irisgeorge/Documents/GitHub/Reef-Survey-Comparison/data")
-
-# Data:
-SVCprey <- read.csv("SVCprey_dataframe.csv")
-SVCpred <- read.csv("SVCpred_dataframe.csv")
-colouration <- read.csv("species_colouration.csv")
-shape <- read.csv("species_shape.csv")
-fnt_group <- read.csv("species_trophic.csv")
-
-# Packages:
+# packages
 library(plyr)
 library(dplyr)
 library(nlme)
@@ -21,66 +25,96 @@ library(ggplot2)
 library(dotwhisker)
 library(arm)
 library(MuMIn)
+library(here)
+
+# data
+SVCprey <- read.csv(here("./dataframes/SVCprey_dataframe.csv"))
+SVCpred <- read.csv(here("./dataframes/SVCpred_dataframe.csv"))
+colouration <- read.csv(here("./clean_data/species_colouration.csv"))
+shape <- read.csv(here("./clean_data/species_shape.csv"))
+fnt_group <- read.csv(here("./clean_data/species_trophic.csv"))
 
 
-#### Dataframe Edits ####
+# Dataframe Edits ==============================================================
 
-# Remove Juveniles:
-colouration <- filter(colouration, lifestage == "adult") # remove juveniles
-colouration <- colouration[,c(1,3)] # remove lifestage column
+# remove juveniles from colouration 
+colouration <- filter(colouration, lifestage == "adult") 
 
-# Join Colouration:
-SVCprey_data <- join(SVCprey, colouration, by = NULL, type = "left", match = "all")
-SVCpred_data <- join(SVCpred, colouration, by = NULL, type = "left", match = "all")
+# remove lifestage column from colouration 
+colouration <- colouration[,c(1,3)] 
 
-# Join Shape:
-shape <- filter(shape, lifestage == "adult") # remove juveniles
+# join colouration to dataframes
+SVCprey_data <- join(SVCprey, colouration, by = NULL, type = "left", 
+                     match = "all")
+SVCpred_data <- join(SVCpred, colouration, by = NULL, type = "left", 
+                     match = "all")
+
+# remove juveniles from shape
+shape <- filter(shape, lifestage == "adult") 
+
+# remove lifestage column from shape
 shape <- shape[,c(1,3)]
-SVCprey_data <- join(SVCprey_data, shape, by = NULL, type = "left", match = "all")
-SVCpred_data <- join(SVCpred_data, shape, by = NULL, type = "left", match = "all")
 
-# Join Functional Group:
-fnt_group <- filter(fnt_group, lifestage == "adult") # remove juveniles
+# join shape to dataframes
+SVCprey_data <- join(SVCprey_data, shape, by = NULL, type = "left", 
+                     match = "all")
+SVCpred_data <- join(SVCpred_data, shape, by = NULL, type = "left", 
+                     match = "all")
+
+# remove juveniles from functional group
+fnt_group <- filter(fnt_group, lifestage == "adult")
+
+# remove lifestage column from functional group
 fnt_group <- fnt_group[,c(1,3)]
-SVCprey_data <- join(SVCprey_data, fnt_group, by = NULL, type = "left", match = "all")
-SVCpred_data <- join(SVCpred_data, fnt_group, by = NULL, type = "left", match = "all")
 
-# Rename Order:
+# join functional group to dataframes
+SVCprey_data <- join(SVCprey_data, fnt_group, by = NULL, type = "left", 
+                     match = "all")
+SVCpred_data <- join(SVCpred_data, fnt_group, by = NULL, type = "left", 
+                     match = "all")
+
+# rename species order column
 SVCprey_model_data <- SVCprey_data %>% rename(species_order = order)
 SVCpred_model_data <- SVCpred_data
 
-# Remove Silversides, Trumpetfish, and Flounder:
-SVCprey_model_data <- SVCprey_model_data[SVCprey_model_data$species_order !="Syngnathiformes",] # remove trumpetfish
-SVCprey_model_data <- SVCprey_model_data[SVCprey_model_data$species_order !="Atheriniformes",] # remove silversides
-SVCprey_model_data <- SVCprey_model_data[SVCprey_model_data$species_order !="Pleuronectiformes",] # remove flounders
-SVCpred_model_data <- SVCpred_model_data[SVCpred_model_data$species_order !="Syngnathiformes",] # remove trumpetfish
+# remove trumpetfish from all dataframes (single species order)
+SVCprey_model_data <- SVCprey_model_data[SVCprey_model_data$species_order 
+                                         !="Syngnathiformes",] 
+SVCpred_model_data <- SVCpred_model_data[SVCpred_model_data$species_order 
+                                         !="Syngnathiformes",] 
 
-# Remove Gray Snapper and Amberjack from SVC vs. Predator:
-SVCpred_model_data <- SVCpred_model_data[SVCpred_model_data$species !="gray snapper",] # not consistently recorded in predator surveys
-SVCpred_model_data <- SVCpred_model_data[SVCpred_model_data$species !="amberjack",] # only schooling species
+# remove silversides from SVC vs. transect (single species order)
+SVCprey_model_data <- SVCprey_model_data[SVCprey_model_data$species_order 
+                                         !="Atheriniformes",] 
 
-# Remove NA Values:
+# remove flounder from SVC vs. transect (only depressiform species)
+SVCprey_model_data <- SVCprey_model_data[SVCprey_model_data$species_order 
+                                         !="Pleuronectiformes",] 
+
+# remove gray snapper from SVC vs. roving (inconsistently recorded)
+SVCpred_model_data <- SVCpred_model_data[SVCpred_model_data$species 
+                                         !="gray snapper",] 
+
+# remove amberjack from SVC vs. roving surveys (only schooling species)
+SVCpred_model_data <- SVCpred_model_data[SVCpred_model_data$species 
+                                         !="amberjack",] 
+
+# remove NA values from dataframes
 SVCprey_model_data <- na.omit(SVCprey_model_data)
 SVCpred_model_data <- na.omit(SVCpred_model_data)
 
-# Remove Size Bin = 0:
+# remove size bin = 0
 SVCprey_model_data <- SVCprey_model_data[SVCprey_model_data$size_bin !=0,]
 SVCpred_model_data <- SVCpred_model_data[SVCpred_model_data$size_bin !=0,]
 
 # Change Variables to Character:
-summary(SVCprey_model_data)
-SVCprey_model_data$size_bin <- as.character(SVCprey_model_data$size_bin)
-summary(SVCpred_model_data)
-SVCpred_model_data$size_bin <- as.character(SVCpred_model_data$size_bin)
-
-write.csv(SVCprey_model_data, "SVCprey_model_data.csv")
-write.csv(SVCpred_model_data, "SVCpred_model_data.csv")
+SVCprey_model_data$size_bin_char <- as.character(SVCprey_model_data$size_bin)
+SVCpred_model_data$size_bin_char <- as.character(SVCpred_model_data$size_bin)
 
 
+# SVC vs. Transect: Original Linear Mixed Effects Model ========================
 
-#### SVC vs. Prey: Linear Mixed Effects Model ####
-
-# Full Model:
+# full model
 SVCprey_model <- lme(log_difference~habitat+octocoral+stony+relief_cm+size_bin+nocturnal+position+max_length+colouration2+behavior+cryptic_behaviour+average_depth, random = list(~1|site, ~1|species_order), na.action = na.omit, SVCprey_model_data) 
 summary(SVCprey_model) 
 # model summary: 
@@ -116,7 +150,7 @@ dwplot(SVCprey_model)
 # link for aesthetics: https://cran.r-project.org/web/packages/dotwhisker/vignettes/dotwhisker-vignette.html
 
 
-#### SVC vs. Predator: Linear Mixed Effects Model ####
+# SVC vs. Roving: Linear Mixed Effects Model ===================================
 
 # Full Model:
 SVCpred_model <- lme(log_difference~habitat+octocoral+stony+relief_cm+size_bin+nocturnal+position+max_length+colouration2+cryptic_behaviour+average_depth, random = list(~1|site, ~1|species_order), na.action = na.omit, SVCpred_model_data) # behaviour not included because all species are solitary 
@@ -149,7 +183,7 @@ boxplot(SVCpred_model_data$log_difference~SVCpred_model_data$colouration2)
 dwplot(SVCpred_model)
 
 
-#### SVC vs. Prey: Shape Model ####
+# SVC vs. Transect: Shape Model ================================================
 
 SVCprey_shape_model <- lme(log_difference~habitat+octocoral+stony+relief_cm+size_bin+nocturnal+position+max_length+colouration2+behavior+cryptic_behaviour+average_depth+shape, random = list(~1|site, ~1|species_order), na.action = na.omit, SVCprey_model_data) 
 summary(SVCprey_shape_model) 
@@ -166,8 +200,7 @@ vif(SVCprey_shape_model)
 boxplot(SVCprey_model_data$log_difference~SVCprey_model_data$shape)
 
 
-
-#### SVC vs. Predator: Shape Model ####
+# SVC vs. Roving: Shape Model ==================================================
 
 SVCpred_shape_model <- lme(log_difference~habitat+octocoral+stony+relief_cm+size_bin+nocturnal+position+max_length+colouration2+cryptic_behaviour+average_depth+shape, random = list(~1|site, ~1|species_order), na.action = na.omit, SVCpred_model_data) 
 summary(SVCpred_shape_model) 
@@ -187,7 +220,7 @@ vif(SVCpred_shape_model)
 boxplot(SVCpred_model_data$log_difference~SVCpred_model_data$shape)
 
 
-#### SVC vs. Prey: Model without Eels ####
+# SVC vs. Roving: Model without Eels ===========================================
 
 # Remove Eels:
 SVCprey_noeels <- SVCprey_model_data[SVCprey_model_data$species_order !="Anguilliformes",] # remove eels
@@ -205,7 +238,7 @@ vif(SVCprey_shape_model)
 # shape GVIF = 6.310282
 
 
-#### SVC vs. Prey: Functional Group Model ####
+# SVC vs. Transect: Functional Group Model =====================================
 
 # Model:
 SVCprey_functional_model <- lme(log_difference~size_bin+fnt_group, random = list(~1|site, ~1|species_order), na.action = na.omit, SVCprey_model_data) 
@@ -232,13 +265,12 @@ boxplot(SVCprey_model_data$log_difference~SVCprey_model_data$size_bin)
 boxplot(SVCprey_model_data$log_difference~SVCprey_model_data$fnt_group)
 
 
-
-#### SVC vs. Predator: Functional Group Model ####
+# SVC vs. Roving: Functional Group Model =======================================
 
 # ALL SPECIES ARE CARNIVORES! 
 
 
-#### SVC vs. Prey: Size Bin Interactions ####
+# SVC vs. Transect: Size Bin Interactions ======================================
 
 # Size Bin x Colouration (without shape):
 SVCprey_sxc_model <- lme(log_difference~habitat+octocoral+stony+relief_cm+size_bin*colouration2+nocturnal+position+max_length+behavior+cryptic_behaviour+average_depth, random = list(~1|site, ~1|species_order), na.action = na.omit, SVCprey_model_data) 
@@ -267,7 +299,7 @@ vif(SVCprey_sxc_model2)
 # Size Bin x Colouration Boxplot:
 boxplot(SVCprey_model_data$log_difference ~ (SVCprey_model_data$colouration2)*(SVCprey_model_data$size_bin))
 
-ggplot(SVCprey_model_data, aes(colouration2, log_difference, fill = size_bin)) + geom_boxplot(show.legend = TRUE) + theme_classic() + scale_fill_manual(name = "Size Bin", values = c("yellow1", "gray65", "white", "blue", "red", "green")) + xlab("Colouration") + 
+ggplot(SVCprey_model_data, aes(colouration2, log_difference, fill = size_bin_char)) + geom_boxplot(show.legend = TRUE) + theme_classic() + scale_fill_manual(name = "Size Bin", values = c("yellow1", "gray65", "white", "blue", "red", "green")) + xlab("Colouration") + 
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
   theme(axis.title = element_text(size = 20)) +
   theme(axis.text= element_text(size = 18)) +
@@ -290,7 +322,7 @@ vif(SVCprey_sxs_model2) # don't want GVIF > 5
 # Size Bin x Shape Boxplot:
 boxplot(SVCprey_model_data$log_difference ~ (SVCprey_model_data$shape)*(SVCprey_model_data$size_bin))
 
-ggplot(SVCprey_noeels, aes(shape, log_difference, fill = size_bin)) + geom_boxplot(show.legend = TRUE) + theme_classic() + scale_fill_manual(name = "Size Bin", values = c("yellow1", "gray65", "white", "blue", "red", "green")) + xlab("Shape") + 
+ggplot(SVCprey_noeels, aes(shape, log_difference, fill = size_bin_char)) + geom_boxplot(show.legend = TRUE) + theme_classic() + scale_fill_manual(name = "Size Bin", values = c("yellow1", "gray65", "white", "blue", "red", "green")) + xlab("Shape") + 
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
   theme(axis.title = element_text(size = 20)) +
   theme(axis.text= element_text(size = 18)) +
@@ -301,7 +333,7 @@ ggplot(SVCprey_noeels, aes(shape, log_difference, fill = size_bin)) + geom_boxpl
              colour = "grey40")
 
 
-#### SVC vs. Predator: Size Bin Interactions ####
+# SVC vs. Roving: Size Bin Interactions ========================================
 
 # Size Bin x Colouration (without shape):
 SVCpred_sxc_model <- lme(log_difference~habitat+octocoral+stony+relief_cm+size_bin*colouration2+nocturnal+position+max_length+cryptic_behaviour+average_depth, random = list(~1|site, ~1|species_order), na.action = na.omit, SVCpred_model_data) 
@@ -316,7 +348,7 @@ vif(SVCpred_sxc_model2) # don't want GVIF > 5
 # Size Bin x Colouration Boxplot:
 boxplot(SVCpred_model_data$log_difference ~ (SVCpred_model_data$colouration2)*(SVCpred_model_data$size_bin))
 
-ggplot(SVCpred_model_data, aes(colouration2, log_difference, fill = size_bin)) + geom_boxplot(show.legend = TRUE) + theme_classic() + scale_fill_manual(name = "Size Bin", values = c("yellow1", "gray65", "white", "red", "blue", "green")) + xlab("Colouration") + 
+ggplot(SVCpred_model_data, aes(colouration2, log_difference, fill = size_bin_char)) + geom_boxplot(show.legend = TRUE) + theme_classic() + scale_fill_manual(name = "Size Bin", values = c("yellow1", "gray65", "white", "red", "blue", "green")) + xlab("Colouration") + 
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
   theme(axis.title = element_text(size = 20)) +
   theme(axis.text= element_text(size = 18)) +
@@ -341,7 +373,7 @@ vif(SVCpred_sxs_model2) # don't want GVIF > 5
 # Size Bin x Shape Boxplot:
 boxplot(SVCpred_model_data$log_difference ~ (SVCpred_model_data$shape)*(SVCpred_model_data$size_bin))
 
-ggplot(SVCprey_model_data, aes(shape, log_difference, fill = size_bin)) + geom_boxplot(show.legend = TRUE) + theme_classic() + scale_fill_manual(name = "Size Bin", values = c("yellow1", "gray65", "white", "blue", "red", "green")) + xlab("Shape") + 
+ggplot(SVCpred_model_data, aes(shape, log_difference, fill = size_bin_char)) + geom_boxplot(show.legend = TRUE) + theme_classic() + scale_fill_manual(name = "Size Bin", values = c("yellow1", "gray65", "white", "blue", "red", "green")) + xlab("Shape") + 
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
   theme(axis.title = element_text(size = 20)) +
   theme(axis.text= element_text(size = 18)) +
@@ -352,7 +384,7 @@ ggplot(SVCprey_model_data, aes(shape, log_difference, fill = size_bin)) + geom_b
              colour = "grey40")
 
 
-#### SVC vs. Prey: Backwards Model Selection ####
+# SVC vs. Transect: Backwards Model Selection ==================================
 
 # Full Model:
 SVCprey_model1 <- lme(log_difference~habitat+octocoral+stony+relief_cm+size_bin+nocturnal+position+max_length+colouration2+behavior+cryptic_behaviour+average_depth+shape, random = list(~1|site, ~1|species_order), SVCprey_model_data) 
@@ -387,7 +419,7 @@ vif(SVCprey_model6) # don't want GVIF > 5
 # ALL COVARIATES ARE SIGNIFICANT NOW, STOP HERE?
 
 
-#### SVC vs. Predator: Backwards Model Selection ####
+# SVC vs. Roving: Backwards Model Selection ====================================
 
 # Full Model:
 SVCpred_model1 <- lme(log_difference~habitat+octocoral+stony+relief_cm+size_bin+nocturnal+position+max_length+colouration2+behavior+cryptic_behaviour+average_depth+shape, random = list(~1|site, ~1|species_order), SVCpred_model_data) 
@@ -422,7 +454,7 @@ vif(SVCpred_model6)
 # Removing shape decreases model fit (increases AIC) --> should I stop there?
 
 
-#### SVC vs. Prey: Dredging ####
+# SVC vs. Transect: Dredging ===================================================
 
 # Global Model:
 SVCprey_global <- lme(log_difference~habitat+octocoral+stony+relief_cm+size_bin*colouration2+nocturnal+position+max_length+behavior+cryptic_behaviour+average_depth+size_bin*shape, random = list(~1|site, ~1|species_order), SVCprey_noeels) 
@@ -457,7 +489,42 @@ confint(model_average)
 # Delta AIC = 1.82 between them and 2.10 between second and third model (third has position)
 saveRDS(SVCprey_global_dredge, "SVCprey_global_dredge.rds")
 
-#### SVC vs. Predator: Dredging ####
+# SVC vs. Roving: Global Model Creation ========================================
+
+# Colouration Model:
+SVCpred_colour <- lme(log_difference~habitat+octocoral+stony+relief_cm+nocturnal+max_length+cryptic_behaviour+average_depth+colouration2+size_bin, random = list(~1|site, ~1|species_order), SVCpred_model_data) # removed shape and position
+summary(SVCpred_colour) # AIC = 1681.823
+vif(SVCpred_colour) # colouration GVIF = 5.983913
+
+# Shape Model:
+SVCpred_shape <- lme(log_difference~habitat+octocoral+stony+relief_cm+nocturnal+position+max_length+cryptic_behaviour+average_depth+shape+size_bin, random = list(~1|site, ~1|species_order), SVCpred_model_data) # removed colouration
+summary(SVCpred_shape) # AIC = 1681.276 (not different from colouration model)
+vif(SVCpred_shape) # shape GVIF = 7.764891
+
+# Habitat Model (from colouration model):
+SVCpred_hab <- lme(log_difference~habitat+octocoral+stony+relief_cm+nocturnal+max_length+cryptic_behaviour+colouration2+size_bin, random = list(~1|site, ~1|species_order), SVCpred_model_data) # removed shape, position, and depth
+summary(SVCpred_hab) # AIC = 1672.4
+vif(SVCpred_hab) # colouration GVIF = 5.935428, all else under 5
+
+# Depth Model (from colouration model):
+SVCpred_depth <- lme(log_difference~octocoral+stony+relief_cm+nocturnal+max_length+cryptic_behaviour+average_depth+colouration2+size_bin, random = list(~1|site, ~1|species_order), SVCpred_model_data) # removed shape, position, and habitat
+summary(SVCpred_depth) # AIC = 1679.494 # higher than habitat model
+vif(SVCpred_depth) # colouration GVIF = 5.927274
+
+# Habitat Model (from shape model):
+SVCpred_hab2 <- lme(log_difference~habitat+octocoral+stony+relief_cm+nocturnal+position+max_length+cryptic_behaviour+shape+size_bin, random = list(~1|site, ~1|species_order), SVCpred_model_data) # removed colouration and depth
+summary(SVCpred_hab2) # AIC = 1671.895 
+vif(SVCpred_hab2) # shape GVIF = 7.659572
+
+# Depth Model (from shape model):
+SVCpred_depth2 <- lme(log_difference~octocoral+stony+relief_cm+nocturnal+position+max_length+cryptic_behaviour+average_depth+shape+size_bin, random = list(~1|site, ~1|species_order), SVCpred_model_data) # removed colouration and habitat
+summary(SVCpred_depth2) # AIC = 1678.854 # higher than habitat model
+vif(SVCpred_depth2) # shape GVIF = 7.659066
+
+# HABITAT MODELS FOR BOTH SHAPE AND COLOURATION RESULT IN BEST FIT, BUT COLOURATION MODEL'S GVIF VALUES ARE LOWER AND COLOURATION HAS MORE ECOLOGICAL SIGNIFICANCE 
+
+
+# SVC vs. Roving: Dredging =====================================================
 
 # Global Model:
 SVCpred_global <- lme(log_difference~habitat+octocoral+stony+relief_cm+nocturnal+position+max_length+cryptic_behaviour+average_depth+colouration2+shape+size_bin, random = list(~1|site, ~1|species_order), SVCpred_model_data) 
@@ -494,9 +561,16 @@ SVCpred_model_data$pres_abs <- ifelse(SVCpred_model_data$SVC_density > 0 & SVCpr
 # Model:
 SVCpred_presabs <- lme(pres_abs~habitat+octocoral+stony+relief_cm+nocturnal+position+max_length+cryptic_behaviour+average_depth+colouration2+shape+size_bin, random = list(~1|site, ~1|species_order), SVCpred_model_data) 
 summary(SVCpred_presabs) 
+summary(SVCpred_global) # compare to density model: changes elongated to significant and stony to insignificant 
 vif(SVCpred_presabs)
+vif(SVCpred_global) # compare to density model: no change, does that make sense?
 
 # Boxplots:
 boxplot(SVCpred_model_data$pres_abs ~ SVCpred_model_data$colouration2)
 boxplot(SVCpred_model_data$pres_abs ~ SVCpred_model_data$shape)
 boxplot(SVCpred_model_data$pres_abs ~ SVCpred_model_data$size_bin)
+
+
+write_csv(SVCprey_noeels, here("./dataframes/SVCprey_model_data.csv"))
+write_csv(SVCpred_model_data, here("./dataframes/SVCpred_model_data.csv"))
+
