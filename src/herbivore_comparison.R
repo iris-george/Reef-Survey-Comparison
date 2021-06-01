@@ -15,18 +15,25 @@
 # Set-Up =======================================================================
 
 # packages
+library(plyr)
 library(tidyverse)
 library(nlme)
 library(car)
 library(arm)
 library(MuMIn)
+library(doBy)
+library(ggplot2)
 library(here)
 
 # data
 SVCprey_model_data <- read_csv(here("./dataframes/SVCprey_model_data.csv"))
+prey_fish <- read_csv(here("./clean_data/prey_fish_data.csv"))
+prey_meta <- read_csv(here("./clean_data/prey_metadata.csv"))
+SVC_lengths <- read_csv(here("./clean_data/SVC_lengths.csv"))
+traits <- read_csv(here("./clean_data/fish_traits.csv"))
 
 
-# Select Herbiviours Species ===================================================
+# Select Herbivorours Species ==================================================
 
 # The following section filters the dataframe comparing all fish species 
 # detected on SVC and transect surveys to contain only herbivorous species for
@@ -97,7 +104,7 @@ herbivore_no_behav <- lme(log_difference~habitat+octocoral+stony+relief_cm
                         random = list(~1|site, ~1|species_order), 
                         herbivores) 
 summary(herbivore_no_behav) # AIC = 6327.085 (similar performance)
-vif(herbivore_no_behav) # shape GVIF = 9.891090 and size_bin GVIF = 9.891090
+vif(herbivore_no_behav) # shape GVIF = 9.891090 and size_bin GVIF = 5.666099
 # DOES NOT CHANGE MODEL FIT AND IMPROVED COLLINEARITY 
 
 # USE MODEL WITHOUT BEHAVIOUR! 
@@ -153,8 +160,7 @@ ggplot(herbivores, aes(x = size_bin_char, y = log_difference,
 # significantly negative (?)
 
 # shape boxplot
-ggplot(herbivores, aes(x = shape, y = log_difference, 
-                       fill = shape)) +
+ggplot(herbivores, aes(x = shape, y = log_difference, fill = shape)) +
   geom_boxplot() +
   theme_classic() + xlab("Body Shape") + 
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
@@ -167,6 +173,10 @@ ggplot(herbivores, aes(x = shape, y = log_difference,
              linetype = "dashed",
              colour = "grey40")
 # fusiform significantly negative
+
+# re-order colouration levels
+herbivores$colouration2 <- factor(herbivores$colouration2, 
+         levels = c("camouflage", "neutral", "colourful"))
 
 # colouration boxplot
 ggplot(herbivores, aes(x = colouration2, y = log_difference, 
@@ -185,7 +195,11 @@ ggplot(herbivores, aes(x = colouration2, y = log_difference,
 # colourful and neutral significantly negative (?)
 
 # shape*size_bin interaction boxplot
-ggplot(herbivores, aes(shape, log_difference, fill = size_bin_char)) + geom_boxplot(show.legend = TRUE) + theme_classic() + scale_fill_manual(name = "Size Bin", values = c("yellow1", "gray65", "white", "blue", "red", "green")) + xlab("Colouration") + 
+ggplot(herbivores, aes(shape, log_difference, fill = size_bin_char)) + 
+  geom_boxplot(show.legend = TRUE) + 
+  theme_classic() + 
+  scale_fill_brewer(name = "Size Bin", palette = "YlGnBu") + 
+  xlab("Shape") + 
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
   theme(axis.title = element_text(size = 20)) +
   theme(axis.text= element_text(size = 18)) +
@@ -195,3 +209,132 @@ ggplot(herbivores, aes(shape, log_difference, fill = size_bin_char)) + geom_boxp
              linetype = "dashed",
              colour = "grey40")
 # size_bin*fusiform significantly positive
+
+ggplot(herbivores, aes(colouration2, log_difference, fill = size_bin_char)) + 
+  geom_boxplot(show.legend = TRUE) + 
+  theme_classic() + 
+  scale_fill_brewer(name = "Size Bin", palette = "YlGnBu") + 
+  xlab("Colouration") + 
+  ylab(bquote("Log Density Difference " (individuals/m^2))) +
+  theme(axis.title = element_text(size = 20)) +
+  theme(axis.text= element_text(size = 18)) +
+  theme(legend.text = element_text(size = 18)) +
+  theme(legend.title = element_text(size = 20)) +
+  geom_hline(yintercept = 0,
+             linetype = "dashed",
+             colour = "grey40")
+
+
+# Density Barplot ==============================================================
+
+# select transect species and session columns
+prey_species <- prey_fish[,c(1,3)]
+
+# aggregate species by session
+prey_species <- prey_fish %>% group_by(session, species) %>% tally()
+
+# rename abundance column
+prey_species <- prey_species %>% rename(prey_abundance = n)
+
+# select transect session and area columns
+prey_area <- prey_meta[,c(1,15)]
+
+# aggregate area by session
+prey_area <- aggregate(.~session, prey_area, sum)
+
+# join area to fish data
+prey_density <- join(prey_species, prey_area, by = NULL, type = "full", 
+                     match = "all")
+
+# select SVC session, species, abundance, and area columns
+SVC_density <- SVC_lengths[,c(1,37,38,12)]
+
+# rename area column
+SVC_density <- SVC_density %>% rename(SVC_area = SVC_cylinder_area)
+
+# transect density calculation
+prey_density$prey_density <- 
+  (prey_density$prey_abundance)/(prey_density$prey_tran_area)
+
+# SVC density calculation 
+SVC_density$SVC_density <- 
+  (SVC_density$SVC_abundance)/(SVC_density$SVC_area)
+
+# join SVC to transect data
+SVCprey_fishdens <- join(prey_density, SVC_density, by = NULL, type = "full", 
+                         match = "all")
+
+# select session, species, and density columns
+SVCprey_fishdens <- SVCprey_fishdens[,c(1,2,5,8)]
+
+# replace NA values with 0
+SVCprey_fishdens[is.na(SVCprey_fishdens)] = 0
+
+# SVC vs. transect survey density difference calculation
+SVCprey_fishdens$density_difference <- 
+  SVCprey_fishdens$SVC_density-SVCprey_fishdens$prey_density
+
+# select trophic categories
+fnt_group <- traits[,c(4,70)]
+
+# re-name species column
+fnt_group <- fnt_group %>% rename(species = common_name)
+
+# re-name trophic column
+fnt_group <- fnt_group %>% rename(fnt_group = `Trophic Position`)
+
+# join trophic categories to dataframe
+SVCprey_fishdens <- join(SVCprey_fishdens, fnt_group, by = NULL, type = "full", 
+                         match = "first")
+
+# filter for herbivores
+herbivore_bar <- filter(SVCprey_fishdens, fnt_group == "herbivore")
+
+# select species and density difference columns from SVC vs. transect data
+herbivore_bar <- herbivore_bar[,c(1,5)]
+
+# aggregate by species 
+herbivore_bar <- summaryBy(density_difference~species, data=herbivore_bar, 
+                         FUN=c(mean,sd))
+
+# rename columns
+herbivore_bar <- herbivore_bar %>% rename(avg_density_dif = density_difference.mean)
+herbivore_bar <- herbivore_bar %>% rename(sd_density_dif = density_difference.sd)
+
+# replace NA values with 0
+herbivore_bar[is.na(herbivore_bar)] <- 0
+
+# SVC vs. transect survey herbivore barplot
+herbivore_barplot <- ggplot(data=herbivore_bar, 
+                          aes(x=species, y=avg_density_dif)) +
+  ylim(-0.2, 0.1) +
+  geom_bar(stat="identity", fill="blue") +
+  theme_classic() + xlab("Species") + 
+  ylab(bquote("Mean Density Difference" (individuals/m^2))) +
+  theme(axis.title = element_text(size = 20)) +
+  theme(axis.text= element_text(size = 14)) +
+  theme(legend.text = element_text(size = 18)) +
+  theme(legend.title = element_text(size = 20)) 
+herbivore_barplot + coord_flip() +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "black")
+
+# barplot with error bars
+herbivore_error_barplot <- ggplot(data=herbivore_bar, 
+                                aes(x=species, y=avg_density_dif)) +
+  geom_bar(stat="identity", fill="blue") +
+  theme_classic() + xlab("Family") + 
+  ylab(bquote("Mean Density Difference" (individuals/m^2))) +
+  theme(axis.title = element_text(size = 20)) +
+  theme(axis.text= element_text(size = 14)) +
+  theme(legend.text = element_text(size = 18)) +
+  theme(legend.title = element_text(size = 20)) 
+herbivore_error_barplot + coord_flip() +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "black") +
+  geom_errorbar(aes(x=species, ymin=avg_density_dif-sd_density_dif, 
+                    ymax=avg_density_dif+sd_density_dif), width = 0.2, 
+                colour = "black", alpha = 0.9, size = 1.3)
+
+
+# add threespot damselfish and yellowtail damselfish 
+# double-check damselfish 
+# try changing redband to colourful 

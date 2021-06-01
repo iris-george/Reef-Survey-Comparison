@@ -28,6 +28,8 @@ library(here)
 SVCprey_model_data <- read_csv(here("./dataframes/SVCprey_model_data.csv"))
 SVCpred_model_data <- read_csv(here("./dataframes/SVCpred_model_data.csv"))
 
+print(SVCprey_model_data$size_bin == 1)
+
 
 # SVC vs. Transect: Global Model ===================================================
 
@@ -49,8 +51,8 @@ SVCprey_global <- lme(log_difference~habitat+octocoral+stony+relief_cm+
 # model summary
 summary(SVCprey_global) 
 # AIC = 29598.41
-# sig pos covariates = octocoral, stony, size bin, colourful, neutral, silvering, 
-# max length, shoaling, size bin*elongated, size bin*fusiform
+# sig pos covariates = octocoral, stony, size bin, colourful, neutral, 
+# silvering, max length, shoaling, size bin*elongated, size bin*fusiform
 # sig neg covariates = habitat, cryptic behaviour, elongated, fusiform, 
 # size bin*colourful, size bin*neutral, size bin*silvering
 
@@ -93,8 +95,11 @@ SVCprey_global_dredge
 # Delta AIC = 1.82 between them and 2.10 between second and third model (third 
 # has position)
 
+# subset dredge
+SVCprey_dredge_sub <- subset(SVCprey_global_dredge, delta < 4) 
+
 # model average 
-SVCprey_model_average <- model.avg(SVCprey_global_dredge)
+SVCprey_model_average <- model.avg(SVCprey_dredge_sub)
 summary(SVCprey_model_average)
 
 # confidence intervals of predictors
@@ -163,12 +168,15 @@ SVCpred_dredge
 # Third model (AICc = 1633.1, delta AICc = 1.64): colouration, position, shape 
 # Fourth model (AICc = 1633.4, delta AICc = 1.90): colouration  
 
+# subset dredge
+SVCpred_dredge_sub <- subset(SVCpred_dredge, delta < 4) 
+
 # model average 
-SVCpred_model_average <- model.avg(SVCpred_global_dredge)
+SVCpred_model_average <- model.avg(SVCpred_dredge_sub)
 summary(SVCpred_model_average)
 
 # covariate confidence intervals
 confint(SVCpred_model_average)
 
 # save dredge results 
-saveRDS(SVCpred_dredge, here("./outputs/SVCprey_dredge.rds"))
+saveRDS(SVCpred_dredge, here("./outputs/SVCpred_dredge.rds"))
