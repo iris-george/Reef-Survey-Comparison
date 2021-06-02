@@ -138,7 +138,7 @@ Chromis multilineata,adult,planktivore
 Chromis multilineata,juvenile,planktivore
 Chromis scotti,adult,planktivore
 Chromis scotti,juvenile,planktivore
-Microspathodon chrysurus,adult,omnivore
+Microspathodon chrysurus,adult,herbivore
 Microspathodon chrysurus,juvenile,omnivore
 Stegastes adustus,adult,herbivore
 Stegastes diencaeus,adult,omnivore
@@ -147,8 +147,8 @@ Stegastes leucostictus,adult,omnivore
 Stegastes leucostictus,juvenile,omnivore
 Stegastes partitus,adult,omnivore
 Stegastes partitus,juvenile,omnivore
-Stegastes planifrons,adult,omnivore
-Stegastes planifrons,juvenile,omnivore
+Stegastes planifrons,adult,herbivore
+Stegastes planifrons,juvenile,herbivore
 Stegastes xanthurus,adult,omnivore
 Stegastes xanthurus,juvenile,omnivore
 Equetus punctatus,adult,invertivore

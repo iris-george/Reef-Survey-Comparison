@@ -15,7 +15,7 @@
 # Set-Up =======================================================================
 
 # packages
-library(plyr)
+library(plyr) 
 library(tidyverse)
 library(nlme)
 library(car)
@@ -70,16 +70,16 @@ herbivore_global <- lme(log_difference~habitat+octocoral+stony+relief_cm
 
 # model summary
 summary(herbivore_global) 
-# AIC = 6325.85
+# AIC = 6524.376
 # significant predictors: octocoral, stony, max_length, cryptic_behaviour, 
-# size_bin, fusiform, colourful, neutral, size_bin*fusiform
+# size_bin, fusiform, size_bin*fusiform
 
 # covariate VIF values
 vif(herbivore_global)
-# habitat GVIF = 5.027517
-# behaviour GVIF = 28.228145
-# size bin GVIF = 5.784482
-# shape GVIF = 38.104405
+# habitat GVIF = 5.272865
+# behaviour GVIF = 14.420305
+# size bin GVIF = 5.395349
+# shape GVIF = 25.652292
 
 
 # Alternate Models =============================================================
@@ -93,8 +93,8 @@ herbivore_no_shape <- lme(log_difference~habitat+octocoral+stony+relief_cm
                         +average_depth+colouration2, 
                         random = list(~1|site, ~1|species_order), 
                         herbivores) 
-summary(herbivore_no_shape) # AIC = 6367.505 (worse performance)
-vif(herbivore_no_shape) # habitat GVIF = 5.146758; all others <5
+summary(herbivore_no_shape) # AIC = 6551.152 (worse performance)
+vif(herbivore_no_shape) # habitat GVIF = 5.323561; all others <5
 # DECREASES MODEL PERFORMANCE BUT IMPROVES COLLINEARITY 
 
 # remove behaviour
@@ -103,8 +103,8 @@ herbivore_no_behav <- lme(log_difference~habitat+octocoral+stony+relief_cm
                         +average_depth+size_bin*shape+colouration2, 
                         random = list(~1|site, ~1|species_order), 
                         herbivores) 
-summary(herbivore_no_behav) # AIC = 6327.085 (similar performance)
-vif(herbivore_no_behav) # shape GVIF = 9.891090 and size_bin GVIF = 5.666099
+summary(herbivore_no_behav) # AIC = 6523.304 (similar performance)
+vif(herbivore_no_behav) # shape GVIF = 9.891090 and size_bin GVIF =5.666099
 # DOES NOT CHANGE MODEL FIT AND IMPROVED COLLINEARITY 
 
 # USE MODEL WITHOUT BEHAVIOUR! 
@@ -174,26 +174,6 @@ ggplot(herbivores, aes(x = shape, y = log_difference, fill = shape)) +
              colour = "grey40")
 # fusiform significantly negative
 
-# re-order colouration levels
-herbivores$colouration2 <- factor(herbivores$colouration2, 
-         levels = c("camouflage", "neutral", "colourful"))
-
-# colouration boxplot
-ggplot(herbivores, aes(x = colouration2, y = log_difference, 
-                       fill = colouration2)) +
-  geom_boxplot() +
-  theme_classic() + xlab("Colouration") + 
-  ylab(bquote("Log Density Difference " (individuals/m^2))) +
-  theme(axis.title = element_text(size = 20)) +
-  theme(axis.text= element_text(size = 18)) +
-  theme(legend.text = element_text(size = 18)) +
-  theme(legend.title = element_text(size = 20)) +
-  scale_fill_brewer(palette = "Dark2") +
-  geom_hline(yintercept = 0,
-             linetype = "dashed",
-             colour = "grey40")
-# colourful and neutral significantly negative (?)
-
 # shape*size_bin interaction boxplot
 ggplot(herbivores, aes(shape, log_difference, fill = size_bin_char)) + 
   geom_boxplot(show.legend = TRUE) + 
@@ -210,22 +190,11 @@ ggplot(herbivores, aes(shape, log_difference, fill = size_bin_char)) +
              colour = "grey40")
 # size_bin*fusiform significantly positive
 
-ggplot(herbivores, aes(colouration2, log_difference, fill = size_bin_char)) + 
-  geom_boxplot(show.legend = TRUE) + 
-  theme_classic() + 
-  scale_fill_brewer(name = "Size Bin", palette = "YlGnBu") + 
-  xlab("Colouration") + 
-  ylab(bquote("Log Density Difference " (individuals/m^2))) +
-  theme(axis.title = element_text(size = 20)) +
-  theme(axis.text= element_text(size = 18)) +
-  theme(legend.text = element_text(size = 18)) +
-  theme(legend.title = element_text(size = 20)) +
-  geom_hline(yintercept = 0,
-             linetype = "dashed",
-             colour = "grey40")
-
 
 # Density Barplot ==============================================================
+
+# The following creates a barplot of the average density differences of each 
+# herbivore species.
 
 # select transect species and session columns
 prey_species <- prey_fish[,c(1,3)]
@@ -334,7 +303,3 @@ herbivore_error_barplot + coord_flip() +
                     ymax=avg_density_dif+sd_density_dif), width = 0.2, 
                 colour = "black", alpha = 0.9, size = 1.3)
 
-
-# add threespot damselfish and yellowtail damselfish 
-# double-check damselfish 
-# try changing redband to colourful 
