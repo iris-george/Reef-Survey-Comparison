@@ -60,13 +60,14 @@ herbivores$cryptic_behaviour <- as.character(herbivores$cryptic_behaviour)
 # global lme model
 herbivore_global <- lme(log_difference~habitat+octocoral+stony+relief_cm
                       +max_length+behavior+cryptic_behaviour
-                      +average_depth+size_bin*shape+colouration2, 
+                      +average_depth+size_bin*shape, 
                       random = list(~1|site, ~1|species_order), 
                       herbivores) 
 # response is log density difference, random effects are site and species order
 # removed colouration*size_bin interaction because of single levels in camo
 # removed nocturnal because all are not
 # removed position because all are demersal 
+# tried size_bin*colouration but was marginally insignificant (p = 0.0511)
 
 # model summary
 summary(herbivore_global) 
@@ -108,6 +109,30 @@ vif(herbivore_no_behav) # shape GVIF = 9.891090 and size_bin GVIF =5.666099
 # DOES NOT CHANGE MODEL FIT AND IMPROVED COLLINEARITY 
 
 # USE MODEL WITHOUT BEHAVIOUR! 
+
+
+# Dredging =====================================================================
+
+# The following dredges the global linear mixed effects model not including 
+# behaviour as a predictor in order to determine the combinations of predictors
+# that result in the models with the highest likelihood.
+
+# dredge
+herbivore_dredge <- dredge(herbivore_no_behav)
+herbivore_dredge
+
+# subset for delta AIC < 4
+herbivore_dredge_sub <- subset(herbivore_dredge, delta < 4)
+
+# model average of top models 
+herbivore_model_avg <- model.avg(herbivore_dredge_sub)
+summary(herbivore_model_avg)
+
+# confidence intervals of top model covariates
+confint(herbivore_model_avg)
+
+# save dredge outputs 
+saveRDS(herbivore_dredge, here("./outputs/herbivore_dredge.rds"))
 
 
 # Covariate Plots ==============================================================
@@ -267,8 +292,10 @@ herbivore_bar <- summaryBy(density_difference~species, data=herbivore_bar,
                          FUN=c(mean,sd))
 
 # rename columns
-herbivore_bar <- herbivore_bar %>% rename(avg_density_dif = density_difference.mean)
-herbivore_bar <- herbivore_bar %>% rename(sd_density_dif = density_difference.sd)
+herbivore_bar <- herbivore_bar %>% 
+  rename(avg_density_dif = density_difference.mean)
+herbivore_bar <- herbivore_bar %>% 
+  rename(sd_density_dif = density_difference.sd)
 
 # replace NA values with 0
 herbivore_bar[is.na(herbivore_bar)] <- 0
