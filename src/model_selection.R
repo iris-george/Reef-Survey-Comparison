@@ -40,7 +40,8 @@ SVCpred_model_data <- read_csv(here("./dataframes/SVCpred_dataframe.csv"))
 
 # global lme model
 SVCprey_global <- lme(log_difference~habitat+octocoral+stony+relief_cm+
-                      size_bin_lengths*colouration+nocturnal+position+max_length+
+                      size_bin_lengths*colouration+nocturnal+position+
+                      max_length+
                       behavior+cryptic_behaviour+average_depth+
                       size_bin_lengths*shape, 
                       random = list(~1|site, ~1|species_order), 

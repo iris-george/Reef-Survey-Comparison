@@ -153,10 +153,13 @@ hist(SVCroving_presence_chi$pred_presence)
 # non-normal
 
 # t-test
-t.test <- t.test(presence ~ survey, data = SVCroving_presence_long, 
+presabs_ttest <- t.test(presence ~ survey, data = SVCroving_presence_long, 
                  var.equal = TRUE)
-t.test
+presabs_ttest
 # t = 2.1688, df = 44, p-value = 0.03554
+
+# kruskal-wallace test
+kruskal.test(presence ~ survey, data = SVCroving_presence_long)
 
 
 # Chi-Square Test: Red Grouper =================================================
@@ -194,6 +197,32 @@ red_grouper_chi <- table(red_grouper$SVC_presence, red_grouper$pred_presence)
 chisq.test(red_grouper_chi)
 # X-squared = 17.72, df = 1, p-value = 2.559e-05
 
+# F-test for equal variance
+var.test(red_grouper$SVC_presence, red_grouper$pred_presence)
+# F = 0.43243, num df = 106, denom df = 106, p-value = 2.187e-05
+# unequal variance
+
+# SVC presence normal distribution check
+shapiro.test(red_grouper$SVC_presence) # p < 2.2e-16
+hist(red_grouper$SVC_presence)
+# non-normal
+
+# roving presence normal distribution check
+shapiro.test(red_grouper$pred_presence) # p = 5.368e-16
+hist(red_grouper$pred_presence)
+# non-normal
+
+# t test
+red_grouper_ttest <- t.test(red_grouper$SVC_presence, red_grouper$pred_presence)
+red_grouper_ttest
+# t = -3.8297, df = 183.23, p-value = 0.000176
+
+# Fischer's exact test
+sum(red_grouper$SVC_presence) # 11 present out of 107 sessions
+sum(red_grouper$pred_presence) # 33 present out of 107 sessions
+fisher.test(matrix(c(11, 107-11, 33, 107-33), ncol=2))
+prop.test(c(11,33), c(107,107))
+
 
 # Chi-Square Test: Black Grouper ===============================================
 
@@ -220,6 +249,32 @@ black_grouper_chi <- table(black_grouper$SVC_presence,
 # chi-square test
 chisq.test(black_grouper_chi)
 # X-squared = 5.33, df = 1, p-value = 0.02096
+
+# F-test for equal variance
+var.test(black_grouper$SVC_presence, black_grouper$pred_presence)
+# F = 0.39819, num df = 106, denom df = 106, p-value = 3.328e-06
+# unequal variance
+
+# SVC presence normal distribution check
+shapiro.test(black_grouper$SVC_presence) # p < 2.2e-16
+hist(black_grouper$SVC_presence)
+# non-normal
+
+# roving presence normal distribution check
+shapiro.test(black_grouper$pred_presence) # p = 1.895e-15
+hist(black_grouper$pred_presence)
+# non-normal
+
+# t test
+black_grouper_ttest <- t.test(black_grouper$SVC_presence, 
+                              black_grouper$pred_presence)
+black_grouper_ttest
+# t = -4.7341, df = 178.86, p-value = 4.459e-06
+
+# Fischer's exact test
+sum(black_grouper$SVC_presence) # 11 present out of 107 sessions
+sum(black_grouper$pred_presence) # 39 present out of 107 sessions
+fisher.test(matrix(c(11, 107-11, 39, 107-39), ncol=2))
 
 
 # Chi-Square Test: Mutton Snapper ==============================================
@@ -248,6 +303,32 @@ mutton_snapper_chi <- table(mutton_snapper$SVC_presence,
 chisq.test(mutton_snapper_chi)
 # X-squared = 15.174, df = 1, p-value = 9.806e-05
 
+# F-test for equal variance
+var.test(mutton_snapper$SVC_presence, mutton_snapper$pred_presence)
+# F = 0.76412, num df = 106, denom df = 106, p-value = 0.1677
+# unequal variance
+
+# SVC presence normal distribution check
+shapiro.test(mutton_snapper$SVC_presence) # p < 2.2e-16
+hist(mutton_snapper$SVC_presence)
+# non-normal
+
+# roving presence normal distribution check
+shapiro.test(mutton_snapper$pred_presence) # p < 2.2e-16
+hist(mutton_snapper$pred_presence)
+# non-normal
+
+# t test
+mutton_snapper_ttest <- t.test(mutton_snapper$SVC_presence, 
+                              mutton_snapper$pred_presence)
+mutton_snapper_ttest
+# t = -1.0944, df = 208.28, p-value = 0.275
+
+# Fischer's exact test
+sum(mutton_snapper$SVC_presence) # 15 present out of 107 sessions
+sum(mutton_snapper$pred_presence) # 21 present out of 107 sessions
+fisher.test(matrix(c(15, 107-15, 21, 107-21), ncol=2))
+
 
 # Chi-Square Test: Lionfish ====================================================
 
@@ -274,3 +355,29 @@ lionfish_chi <- table(lionfish$SVC_presence,
 # chi-square test
 chisq.test(lionfish_chi)
 # X-squared = 0.62845, df = 1, p-value = 0.4279 
+
+# F-test for equal variance
+var.test(lionfish$SVC_presence, lionfish$pred_presence)
+# F = 0.19953, num df = 106, denom df = 106, p-value = 3.116e-15
+# unequal variance
+
+# SVC presence normal distribution check
+shapiro.test(lionfish$SVC_presence) # p < 2.2e-16
+hist(lionfish$SVC_presence)
+# non-normal
+
+# roving presence normal distribution check
+shapiro.test(lionfish$pred_presence) # p < 2.2e-16
+hist(lionfish$pred_presence)
+# non-normal
+
+# t test
+lionfish_ttest <- t.test(lionfish$SVC_presence, 
+                               lionfish$pred_presence)
+lionfish_ttest
+# t = -5.7641, df = 146.68, p-value = 4.673e-08
+
+# Fischer's exact test
+sum(lionfish$SVC_presence) # 5 present out of 107 sessions
+sum(lionfish$pred_presence) # 36 present out of 107 sessions
+fisher.test(matrix(c(5, 107-5, 36, 107-36), ncol=2))

@@ -318,3 +318,18 @@ ggsave(here("./visuals/SVCpred_shape_box.png"), pred_shape)
 SVCpred_plots <- ggarrange(pred_stony, pred_size, pred_colour, pred_shape, 
           labels = c("", "", "", ""), ncol = 2, nrow = 2)
 ggsave(here("./visuals/SVCpred_plots.png"), SVCpred_plots)
+
+pred_sizecol <- ggplot(SVCpred_model_data, aes(colouration, log_difference, 
+                                               fill = size_bin_char)) + 
+  geom_boxplot(show.legend = TRUE) + 
+  theme_classic() + 
+  xlab("Colouration") + 
+  ylab(bquote("Log Density Difference " (individuals/m^2))) +
+  theme(axis.title = element_text(size = 14)) +
+  theme(axis.text= element_text(size = 14)) +
+  theme(legend.text = element_text(size = 14)) +
+  theme(legend.title = element_text(size = 14)) +
+  scale_fill_brewer(name = "Size Bin", palette = "YlGnBu") +
+  geom_hline(yintercept = 0,
+             linetype = "dashed",
+             colour = "grey40")
