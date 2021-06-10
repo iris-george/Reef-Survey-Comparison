@@ -25,11 +25,11 @@ library(MuMIn)
 library(here)
 
 # data
-SVCprey_model_data <- read_csv(here("./dataframes/SVCprey_model_data.csv"))
-SVCpred_model_data <- read_csv(here("./dataframes/SVCpred_model_data.csv"))
+SVCprey_model_data <- read_csv(here("./dataframes/SVCprey_dataframe.csv"))
+SVCpred_model_data <- read_csv(here("./dataframes/SVCpred_dataframe.csv"))
 
 
-# SVC vs. Transect: Global Model ===================================================
+# SVC vs. Transect: Global Model ===============================================
 
 # In the following, a linear mixed model is created to compare fish density 
 # differences between SVC and transect surveys in response to predictors 
@@ -40,27 +40,17 @@ SVCpred_model_data <- read_csv(here("./dataframes/SVCpred_model_data.csv"))
 
 # global lme model
 SVCprey_global <- lme(log_difference~habitat+octocoral+stony+relief_cm+
-                      size_bin*colouration2+nocturnal+position+max_length+
-                      behavior+cryptic_behaviour+average_depth+size_bin*shape, 
+                      size_bin_lengths*colouration+nocturnal+position+max_length+
+                      behavior+cryptic_behaviour+average_depth+
+                      size_bin_lengths*shape, 
                       random = list(~1|site, ~1|species_order), 
                       SVCprey_model_data) 
-# response is log density difference, random effects are site and species order
 
 # model summary
 summary(SVCprey_global) 
-# AIC = 29598.41
-# sig pos covariates = octocoral, stony, size bin, colourful, neutral, 
-# silvering, max length, shoaling, size bin*elongated, size bin*fusiform
-# sig neg covariates = habitat, cryptic behaviour, elongated, fusiform, 
-# size bin*colourful, size bin*neutral, size bin*silvering
 
 # covariate VIF values
 vif(SVCprey_global) 
-# size bin GVIF = 24.897697 
-# colouration GVIF = 409.450179 
-# shape GVIF = 40.288049
-# size bin*colouration GVIF = 1266.492002
-# size bin*shape GVIF = 31.333791
 
 # random effects plot
 plot(ranef(SVCprey_global))
@@ -116,26 +106,31 @@ saveRDS(SVCprey_global_dredge, here("./outputs/SVCprey_global_dredge.rds"))
 # the VIF values for each predictor, and model fit is determined through 
 # random effects plots, residual plots, qq plots, and model plots. 
 
-# global lme model
-SVCpred_global <- lme(log_difference~habitat+octocoral+stony+relief_cm+
+# colour lme model
+SVCpred_colour <- lme(log_difference~habitat+octocoral+stony+relief_cm+
                       nocturnal+max_length+cryptic_behaviour+ average_depth+
-                      colouration2+size_bin, 
+                      colouration2+size_bin_lengths, 
                       random = list(~1|site, ~1|species_order),
                       SVCpred_model_data) 
 
 # model summary 
-summary(SVCpred_global) 
-# AIC = 1695.676
-# sig pos covariates = silvering
-# sig neg covariates = stony, size bin
+summary(SVCpred_colour) 
 
 # covariate VIF values
-vif(SVCpred_global)
-# habitat GVIF = 6.832051
-# position GVIF = 6.634015
-# depth GVIF = 5.079790
-# colouration GVIF = 21.218479
-# shape GVIF = 9.864492
+vif(SVCpred_colour)
+
+# shape lme model
+SVCpred_shape <- lme(log_difference~habitat+octocoral+stony+relief_cm+
+                        nocturnal+max_length+cryptic_behaviour+ average_depth+
+                        shape+size_bin_lengths, 
+                      random = list(~1|site, ~1|species_order),
+                      SVCpred_model_data) 
+
+# model summary 
+summary(SVCpred_shape) 
+
+# covariate VIF values
+vif(SVCpred_shape)
 
 # random effects plot
 plot(ranef(SVCpred_global))

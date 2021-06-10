@@ -90,11 +90,15 @@ pred_area <- aggregate(.~session, pred_area, sum)
 pred_density <- join(pred_species, pred_area, by = NULL, type = "full",
                      match = "all")
 
-# select SVC session, species, abundance, and area columns
-SVC_density <- SVC_lengths[,c(1,37,38,12)]
+# select SVC session, species, and abundance columns
+SVC_density <- SVC_lengths[,c(1,2,5)]
 
-# rename area column
-SVC_density <- SVC_density %>% rename(SVC_area = SVC_cylinder_area)
+# select SVC area column
+SVC_area <- SVC_meta[,c(1,5)]
+
+# join SVC_area and SVC_density
+SVC_density <- join(SVC_density, SVC_area, by = NULL, type = "left", 
+                    match = "first")
 
 
 # Density Calculation ==========================================================
@@ -152,7 +156,6 @@ predator_presence <- traits[,c(3,4,7)]
 
 # rename columns
 predator_presence <- predator_presence %>% rename(species = common_name)
-predator_presence <- predator_presence %>% rename(binomial = Binomial)
 
 # join predator presence to SVC and roving survey dataframe
 SVCpred_fishdens <- join(SVCpred_fishdens, predator_presence, by = NULL, 
@@ -193,7 +196,6 @@ family <- traits[,c(2,4)]
 
 # rename columns
 family <- family %>% rename(species = common_name)
-family <- family %>% rename(family = Family)
 
 # join family to SVC vs. transect survey data
 SVCprey_bar <- join(SVCprey_bar, family, by = NULL, type = "full", 
@@ -235,7 +237,7 @@ SVCpred_bar[is.na(SVCpred_bar)] <- 0
 SVCpred_bar <- SVCpred_bar[SVCpred_bar$species !=0,]
 
 
-# Remove Problem Species ==================================================
+# Remove Problem Species =======================================================
 
 # The following removes single-order species from the dataframes as these 
 # species were not used in analyses.
@@ -243,8 +245,9 @@ SVCpred_bar <- SVCpred_bar[SVCpred_bar$species !=0,]
 # remove silversides, trumpetfish, eels, and flounder from SVC vs. transect data
 SVCprey_family <- SVCprey_family[c(1:2,5:6,8:24,27:38),] 
 
-# remove trumpetfish, gray snapper, and amberjack from SVC vs. roving data
-SVCpred_bar <- SVCpred_bar[c(2:8,10:23),]
+# remove trumpetfish, gray snapper, amberjack, and black margate from SVC vs. 
+# roving data
+SVCpred_bar <- SVCpred_bar[c(2:3,5:8,10:23),]
 
 
 # Density Difference Barplots ==================================================
@@ -264,8 +267,9 @@ SVCprey_barplot <- ggplot(data=SVCprey_family,
   theme(axis.text= element_text(size = 14)) +
   theme(legend.text = element_text(size = 18)) +
   theme(legend.title = element_text(size = 20)) 
-SVCprey_barplot + coord_flip() +
+SVCprey_bar <- SVCprey_barplot + coord_flip() +
   geom_hline(yintercept = 0, linetype = "dashed", colour = "black")
+ggsave(here("./visuals/SVCprey_density_barplot.png"), SVCprey_bar)
 
 # SVC vs. roving survey barplot
 SVCpred_barplot <- ggplot(data=SVCpred_bar, aes(x=species, y=avg_density_dif)) +
@@ -277,11 +281,12 @@ SVCpred_barplot <- ggplot(data=SVCpred_bar, aes(x=species, y=avg_density_dif)) +
   theme(axis.text= element_text(size = 14)) +
   theme(legend.text = element_text(size = 18)) +
   theme(legend.title = element_text(size = 20)) +
-  ylim(-0.005, 0.008)
-SVCpred_barplot + coord_flip() +
+  ylim(-0.003, 0.005)
+SVCpred_bar <- SVCpred_barplot + coord_flip() +
   geom_hline(yintercept = 0,
              linetype = "dashed",
              colour = "black") 
+ggsave(here("./visuals/SVCpred_density_barplot.png"), SVCpred_bar)
 
 
 # Density Difference Barplots with Error Bars ==================================

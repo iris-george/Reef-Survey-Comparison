@@ -1,11 +1,14 @@
-########## SURVEY COMPARISON PROJECT MODEL CREATION AND SELECTION ##########
+########## SURVEY COMPARISON PROJECT PRESENCE/ABSENCE COMPARISON ##########
 ########## 
 ##########
 # This file creates a dataframe outlining the total number of sessions each 
 # species observed in SVC and roving surveys was present in. Only a subset of 
 # large, predatory reef fish species are extracted as these were the only group
-# surveyed for by roving surveys. The dataframe created here will be used to 
-# compare 
+# surveyed for by roving surveys. The dataframe created is used to compare 
+# presence recordings between SVC and roving surveys within and across species
+# in order to explore if significant differences are present and how these
+# differences compare to differences in density across species explored 
+# previously. 
 ##########
 ##########
 # AUTHOR: Iris M. George
@@ -30,7 +33,8 @@ traits <- read_csv(here("./clean_data/fish_traits.csv"))
 
 # Obtain Presence Values =======================================================
 
-# The following compiles all presence observations for each species.
+# The following compiles all presence observations across sessions for each 
+# species.
 
 # extract SVC observations
 SVC_fish <- SVC_fish_data[,c(1,37)]
@@ -106,15 +110,23 @@ SVCroving_presence_chi <- join(SVC_presence, pred_presence, by = NULL,
 
 # Barplot ======================================================================
 
-ggplot(SVCroving_presence_long, aes(x = species, y = presence, fill = survey)) +
-  geom_bar(position = "dodge", stat = "identity") +
-  theme_classic() + xlab("Species") + 
+# The following creates a barplot of the number of sessions each species was 
+# recorded in between SVC and roving surveys. 
+
+# barplot
+SVCpred_presabs_bar <- ggplot(SVCroving_presence_long, aes(x = species, 
+                       y = presence, fill = survey)) +
+  geom_bar(position = "dodge", stat = "identity", color = "black") +
+  theme_classic() + 
+  xlab("Species") + 
   ylab("Number of Sessions Present") +
+  scale_fill_manual(values = c("lemonchiffon1", "navyblue")) +
   theme(axis.title = element_text(size = 20)) +
   theme(axis.text = element_text(size = 14)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
   theme(legend.text = element_text(size = 18)) +
   theme(legend.title = element_text(size = 20)) 
+ggsave(here("./visuals/SVCpred_presabs_barplot.png"), SVCpred_presabs_bar)
 
 
 # T-Test on Species' Presence ==================================================
@@ -149,6 +161,9 @@ t.test
 
 # Chi-Square Test: Red Grouper =================================================
 
+# The following performs a Chi-Square test on presence/absence recordings of 
+# red grouper across sessions between SVC and roving surveys. 
+
 # extract roving sessions
 pred_sessions <- pred_fish[,1]
 
@@ -182,6 +197,9 @@ chisq.test(red_grouper_chi)
 
 # Chi-Square Test: Black Grouper ===============================================
 
+# The following performs a Chi-Square test on presence/absence recordings of 
+# black grouper across sessions between SVC and roving surveys. 
+
 # add species column for black grouper
 black_grouper <- pred_sessions
 black_grouper$species <- "black grouper"
@@ -206,6 +224,9 @@ chisq.test(black_grouper_chi)
 
 # Chi-Square Test: Mutton Snapper ==============================================
 
+# The following performs a Chi-Square test on presence/absence recordings of 
+# mutton snapper across sessions between SVC and roving surveys. 
+
 # add species column for mutton snapper
 mutton_snapper <- pred_sessions
 mutton_snapper$species <- "mutton snapper"
@@ -229,6 +250,9 @@ chisq.test(mutton_snapper_chi)
 
 
 # Chi-Square Test: Lionfish ====================================================
+
+# The following performs a Chi-Square test on presence/absence recordings of 
+# lionfish across sessions between SVC and roving surveys. 
 
 # add species column for lionfish
 lionfish <- pred_sessions
