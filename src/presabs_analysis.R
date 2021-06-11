@@ -221,7 +221,23 @@ red_grouper_ttest
 sum(red_grouper$SVC_presence) # 11 present out of 107 sessions
 sum(red_grouper$pred_presence) # 33 present out of 107 sessions
 fisher.test(matrix(c(11, 107-11, 33, 107-33), ncol=2))
-prop.test(c(11,33), c(107,107))
+
+# sum presence
+red_grouper$presence_sum <- red_grouper$SVC_presence + red_grouper$pred_presence
+
+# remove rows where presence = 0 for both surveys
+red_grouper_chi <- red_grouper[red_grouper$presence_sum !=0,] 
+
+# convert to table
+red_grouper_chi <- table(red_grouper_chi$SVC_presence, red_grouper_chi$pred_presence)
+
+# chi-square test
+chisq.test(red_grouper_chi)
+
+# proportion test
+prop.test(c(11,33), c(107,107), alternative = "two.sided", correct = FALSE)
+# X-squared = 13.847, df = 1, p-value = 0.0001983
+# http://www.sthda.com/english/wiki/two-proportions-z-test-in-r 
 
 
 # Chi-Square Test: Black Grouper ===============================================
