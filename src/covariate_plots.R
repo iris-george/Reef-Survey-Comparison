@@ -81,7 +81,7 @@ ggsave(here("./visuals/SVCprey_habitat_box.png"), prey_hab)
 
 # stony coral scatterplot
 prey_stony <- ggplot(SVCprey_model_data, aes(x = stony, y = log_difference)) + 
-  geom_point(size = 2) +
+  geom_jitter(width = 2, height = 0.1) +
   theme_classic() + xlab("Percent Stony Coral") + 
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
   theme(axis.title = element_text(size = 14)) +
@@ -95,7 +95,7 @@ ggsave(here("./visuals/SVCprey_stony_scatter.png"), prey_stony)
 # octocoral scatterplot
 prey_octo <- ggplot(SVCprey_model_data, aes(x = octocoral, 
                                             y = log_difference)) + 
-  geom_point(size = 2) +
+  geom_jitter(width = 2, height = 0.1) +
   theme_classic() + xlab("Percent Octocoral") + 
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
   theme(axis.title = element_text(size = 14)) +
@@ -166,7 +166,7 @@ ggsave(here("./visuals/SVCprey_behaviour_box.png"), prey_behav)
 # maximum lengths scatterplot
 prey_max <- ggplot(SVCprey_model_data, aes(x = max_length, 
                                            y = log_difference)) + 
-  geom_point(size = 2) +
+  geom_jitter(width = 1, height = 0.1)  +
   theme_classic() + xlab("Maximum Length") + 
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
   theme(axis.title = element_text(size = 14)) +
@@ -257,7 +257,7 @@ ggsave(here("./visuals/SVCprey_sizeshape_plots.png"), sizesha_plots)
 
 # stony coral scatterplot
 pred_stony <- ggplot(SVCpred_model_data, aes(x = stony, y = log_difference)) + 
-  geom_point(size = 2) +
+  geom_jitter(width = 2, height = 1)  +
   theme_classic() + xlab("Percent Stony Coral") + 
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
   theme(axis.title = element_text(size = 14)) +

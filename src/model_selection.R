@@ -41,8 +41,7 @@ SVCpred_model_data <- read_csv(here("./dataframes/SVCpred_dataframe.csv"))
 # global lme model
 SVCprey_global <- lme(log_difference~habitat+octocoral+stony+relief_cm+
                       size_bin_lengths*colouration+nocturnal+position+
-                      max_length+
-                      behavior+cryptic_behaviour+average_depth+
+                      max_length+behavior+cryptic_behaviour+average_depth+
                       size_bin_lengths*shape, 
                       random = list(~1|site, ~1|species_order), 
                       SVCprey_model_data) 
@@ -75,27 +74,28 @@ plot(SVCprey_global)
 # determine which combination of predictors results in the most likely model.
 
 # dredge
-SVCprey_global_dredge <- dredge(SVCprey_global)
-SVCprey_global_dredge
-# First model (AICc = 29562.4): colouration, cryptic behaviour, habitat, max 
-# length, shape, size bin, colouration*size bin, shape*size bin
-# Second model ( AICc = : aggregation behaviour, colouration, cryptic behaviour, 
-# habitat, max length, shape, size bin, colouration*size bin, shape*size bin
-# Delta AIC = 1.82 between them and 2.10 between second and third model (third 
-# has position)
+SVCprey_dredge <- dredge(SVCprey_global)
+SVCprey_dredge
+
+# save dredge output 
+saveRDS(SVCprey_dredge, here("./outputs/SVCprey_global_dredge.rds"))
 
 # subset dredge
-SVCprey_dredge_sub <- subset(SVCprey_global_dredge, delta < 4) 
+SVCprey_dredge_sub <- subset(SVCprey_dredge, delta < 4) 
 
 # model average 
 SVCprey_model_average <- model.avg(SVCprey_dredge_sub)
 summary(SVCprey_model_average)
 
-# confidence intervals of predictors
-confint(SVCprey_model_average)
+# save model average
+saveRDS(SVCprey_model_average, here("./outputs/SVCprey_drege_average.rds"))
 
-# save dredge output 
-saveRDS(SVCprey_global_dredge, here("./outputs/SVCprey_global_dredge.rds"))
+# confidence intervals of predictors
+SVCprey_confidence <- confint(SVCprey_model_average)
+summary(SVCprey_confidence )
+
+# save confidence intervals
+saveRDS(SVCprey_confidence, here("./outputs/SVCprey_dredge_CI.rds"))
 
 
 # SVC vs. Roving: Global Model =================================================
@@ -107,31 +107,18 @@ saveRDS(SVCprey_global_dredge, here("./outputs/SVCprey_global_dredge.rds"))
 # the VIF values for each predictor, and model fit is determined through 
 # random effects plots, residual plots, qq plots, and model plots. 
 
-# colour lme model
-SVCpred_colour <- lme(log_difference~habitat+octocoral+stony+relief_cm+
-                      nocturnal+max_length+cryptic_behaviour+ average_depth+
-                      colouration2+size_bin_lengths, 
+# global lme model
+SVCpred_global <- lme(log_difference~habitat+octocoral+stony+relief_cm+
+                      nocturnal+max_length+cryptic_behaviour+colouration+
+                      size_bin_lengths, 
                       random = list(~1|site, ~1|species_order),
                       SVCpred_model_data) 
 
 # model summary 
-summary(SVCpred_colour) 
+summary(SVCpred_global) 
 
 # covariate VIF values
-vif(SVCpred_colour)
-
-# shape lme model
-SVCpred_shape <- lme(log_difference~habitat+octocoral+stony+relief_cm+
-                        nocturnal+max_length+cryptic_behaviour+ average_depth+
-                        shape+size_bin_lengths, 
-                      random = list(~1|site, ~1|species_order),
-                      SVCpred_model_data) 
-
-# model summary 
-summary(SVCpred_shape) 
-
-# covariate VIF values
-vif(SVCpred_shape)
+vif(SVCpred_global)
 
 # random effects plot
 plot(ranef(SVCpred_global))
@@ -157,10 +144,9 @@ plot(SVCpred_global)
 # dredge
 SVCpred_dredge <- dredge(SVCpred_global)
 SVCpred_dredge
-# First model (AICc = 1631.5): colouration, shape
-# Second model (AICc = 1631.6, delta AICc = 0.11): cryptic behaviour, shape 
-# Third model (AICc = 1633.1, delta AICc = 1.64): colouration, position, shape 
-# Fourth model (AICc = 1633.4, delta AICc = 1.90): colouration  
+
+# save dredge results 
+saveRDS(SVCpred_dredge, here("./outputs/SVCpred_dredge.rds"))
 
 # subset dredge
 SVCpred_dredge_sub <- subset(SVCpred_dredge, delta < 4) 
@@ -169,8 +155,12 @@ SVCpred_dredge_sub <- subset(SVCpred_dredge, delta < 4)
 SVCpred_model_average <- model.avg(SVCpred_dredge_sub)
 summary(SVCpred_model_average)
 
-# covariate confidence intervals
-confint(SVCpred_model_average)
+# save model average
+saveRDS(SVCpred_model_average, here("./outputs/SVCpred_dredge_average.rds"))
 
-# save dredge results 
-saveRDS(SVCpred_dredge, here("./outputs/SVCpred_dredge.rds"))
+# covariate confidence intervals
+SVCpred_confidence <- confint(SVCpred_model_average)
+summary(SVCpred_confidence)
+
+# save confidence intervals
+saveRDS(SVCpred_confidence, here("./outputs/SVCpred_dredge_CI.rds"))

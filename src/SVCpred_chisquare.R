@@ -100,12 +100,11 @@ SVCroving_presence <- bind_rows(SVC_presence, pred_presence)
 # significant difference between survey types exists.
 
 # convert dataframe to table
-SVCroving_chi <- table(SVCroving_presence_long$species, 
-                       SVCroving_presence_long$survey)
+SVCroving_chi <- table(SVCroving_presence$species, 
+                       SVCroving_presence$survey)
 
 # Chi-Square Test
-chisq.test(table(SVCroving_presence_long$species, 
-                 SVCroving_presence_long$survey))
+chisq.test(SVCroving_chi)
 
 
 # Barplot ======================================================================
@@ -133,7 +132,8 @@ SVCroving_presence_bar <- aggregate(.~species+survey, SVCroving_presence, sum)
 
 # significance stars
 significance1 <- data.frame(Group = c("goldentail moray", "red hind", 
-                                     "greater soapfish", "spotted scorpionfish"),
+                                     "greater soapfish", 
+                                     "spotted scorpionfish"),
                            Value = c(10,10,10,12))
 significance2 <- data.frame(Group = c("purplemouth moray"),
                             Value = c(18))
@@ -142,6 +142,14 @@ significance3 <- data.frame(Group = c("green moray", "spotted moray",
                                       "nassau grouper", "red grouper",  
                                       "lionfish", "trumpetfish"),
                             Value = c(23,60,43,30,24,38,40,30))
+
+significance <- data.frame(Group = c("goldentail moray", "red hind", 
+                                     "greater soapfish", "spotted scorpionfish",
+                                     "purplemouth moray", "green moray", 
+                                     "spotted moray", "black grouper", 
+                                     "gag grouper", "nassau grouper", 
+                                     "red grouper", "lionfish", "trumpetfish"),
+                           Value = c(10,10,10,12,18,23,60,43,30,24,38,40,30))
 
 # * = 0.05, ** = 0.01, *** = 0..001
 

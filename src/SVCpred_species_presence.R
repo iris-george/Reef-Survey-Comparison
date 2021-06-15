@@ -298,6 +298,10 @@ chisq.test(amberjack_chi)
 black_grouper <- pred_sessions
 black_grouper$species <- "black grouper"
 
+# add presence column
+SVC_fish$SVC_presence <- 1
+pred_fish$pred_presence <- 1
+
 # join black grouper presence values to each session
 black_grouper_SVC <- join(black_grouper, SVC_fish, by = NULL, type = "left", 
                           match = "first")
@@ -623,6 +627,10 @@ chisq.test(rock_hind_chi)
 greater_soapfish <- pred_sessions
 greater_soapfish$species <- "greater soapfish"
 
+# add presence column
+SVC_fish$SVC_presence <- 1
+pred_fish$pred_presence <- 1
+
 # join greater soapfish presence values to each session
 greater_soapfish_SVC <- join(greater_soapfish, SVC_fish, by = NULL, 
                              type = "left", match = "first")
@@ -660,6 +668,10 @@ chisq.test(greater_soapfish_chi)
 # add species column for scamp
 scamp <- pred_sessions
 scamp$species <- "scamp"
+
+# add presence column
+SVC_fish$SVC_presence <- 1
+pred_fish$pred_presence <- 1
 
 # join scamp presence values to each session
 scamp_SVC <- join(scamp, SVC_fish, by = NULL, type = "left", 
@@ -699,6 +711,10 @@ chisq.test(scamp_chi)
 black_margate <- pred_sessions
 black_margate$species <- "black margate"
 
+# add presence column
+SVC_fish$SVC_presence <- 1
+pred_fish$pred_presence <- 1
+
 # join black margate presence values to each session
 black_margate_SVC <- join(black_margate, SVC_fish, by = NULL, type = "left", 
                            match = "first")
@@ -736,6 +752,10 @@ chisq.test(black_margate_chi)
 # add species column for cubera snapper
 cubera_snapper <- pred_sessions
 cubera_snapper$species <- "cubera snapper"
+
+# add presence column
+SVC_fish$SVC_presence <- 1
+pred_fish$pred_presence <- 1
 
 # join cubera snapper presence values to each session
 cubera_snapper_SVC <- join(cubera_snapper, SVC_fish, by = NULL, type = "left", 
@@ -775,6 +795,10 @@ chisq.test(cubera_snapper_chi)
 mutton_snapper <- pred_sessions
 mutton_snapper$species <- "mutton snapper"
 
+# add presence column
+SVC_fish$SVC_presence <- 1
+pred_fish$pred_presence <- 1
+
 # join mutton snapper presence values to each session
 mutton_snapper_SVC <- join(mutton_snapper, SVC_fish, by = NULL, type = "left", 
                           match = "first")
@@ -813,6 +837,10 @@ chisq.test(mutton_snapper_chi)
 barracuda <- pred_sessions
 barracuda$species <- "barracuda"
 
+# add presence column
+SVC_fish$SVC_presence <- 1
+pred_fish$pred_presence <- 1
+
 # join barracuda presence values to each session
 barracuda_SVC <- join(barracuda, SVC_fish, by = NULL, type = "left", 
                      match = "first")
@@ -850,6 +878,10 @@ chisq.test(barracuda_chi)
 lionfish <- pred_sessions
 lionfish$species <- "lionfish"
 
+# add presence column
+SVC_fish$SVC_presence <- 1
+pred_fish$pred_presence <- 1
+
 # join lionfish presence values to each session
 lionfish_SVC <- join(lionfish, SVC_fish, by = NULL, type = "left", 
                            match = "first")
@@ -886,6 +918,10 @@ chisq.test(lionfish_chi)
 # add species column for spotted scorpionfish
 spotted_scorpionfish <- pred_sessions
 spotted_scorpionfish$species <- "spotted scorpionfish"
+
+# add presence column
+SVC_fish$SVC_presence <- 1
+pred_fish$pred_presence <- 1
 
 # join spotted scorpionfish presence values to each session
 spotted_scorpionfish_SVC <- join(spotted_scorpionfish, SVC_fish, by = NULL, 
@@ -927,6 +963,10 @@ chisq.test(spotted_scorpionfish_chi)
 # add species column for trumpetfish
 trumpetfish <- pred_sessions
 trumpetfish$species <- "trumpetfish"
+
+# add presence column
+SVC_fish$SVC_presence <- 1
+pred_fish$pred_presence <- 1
 
 # join trumpetfish presence values to each session
 trumpetfish_SVC <- join(trumpetfish, SVC_fish, by = NULL, type = "left", 
