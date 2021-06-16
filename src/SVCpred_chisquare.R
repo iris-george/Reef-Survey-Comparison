@@ -166,9 +166,4 @@ SVCpred_presabs_bar <- ggplot(SVCroving_presence_bar, aes(x = species,
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
   theme(legend.text = element_text(size = 18)) +
   theme(legend.title = element_text(size = 20)) 
-
-SVCpred_presabs_bar + 
-  geom_text(data = significance1, label = "*") +
-  geom_text(data = significance2, label = "**") +
-  geom_text(data = significance3, label = "***")
-ggsave(here("./visuals/SVCpred_presabs_barplot.png"), SVCpred_presabs_bar)
+ggsave(here("./visuals/SVCpred_presabs_bar.png"), SVCpred_presabs_bar)

@@ -561,13 +561,17 @@ saveRDS(SVCprey_global_dredge, "SVCprey_global_dredge.rds")
 
 # SVC vs. Roving: Global Model Creation ========================================
 
+# full model:
+SVCpred_full <- lme(log_difference~habitat+octocoral+stony+relief_cm+nocturnal+max_length+cryptic_behaviour+average_depth+colouration+size_bin_lengths+shape+position, random = list(~1|site, ~1|species_order), SVCpred_model_data) 
+vif(SVCpred_full)
+
 # Colouration Model:
 SVCpred_colour <- lme(log_difference~habitat+octocoral+stony+relief_cm+nocturnal+max_length+cryptic_behaviour+average_depth+colouration+size_bin, random = list(~1|site, ~1|species_order), SVCpred_model_data) # removed shape and position
 summary(SVCpred_colour) # AIC = 1628.087
 vif(SVCpred_colour) # colouration GVIF = 5.983913
 
 # Shape Model:
-SVCpred_shape <- lme(log_difference~habitat+octocoral+stony+relief_cm+nocturnal+position+max_length+cryptic_behaviour+average_depth+shape+size_bin, random = list(~1|site, ~1|species_order), SVCpred_model_data) # removed colouration
+SVCpred_shape <- lme(log_difference~habitat+octocoral+stony+relief_cm+nocturnal+position+max_length+cryptic_behaviour+average_depth+shape+size_bin_lengths, random = list(~1|site, ~1|species_order), SVCpred_model_data) # removed colouration
 summary(SVCpred_shape) # AIC = 1625.848 (delta AIC 2.239)
 vif(SVCpred_shape) # shape GVIF = 7.764891
 
@@ -605,7 +609,7 @@ vif(SVCpred2) # shape GVIF = 7.659066
 # SVC vs. Roving: Dredging =====================================================
 
 # Global Model:
-SVCpred_global <- lme(log_difference~habitat+octocoral+stony+relief_cm+nocturnal+position+max_length+cryptic_behaviour+average_depth+colouration2+shape+size_bin, random = list(~1|site, ~1|species_order), SVCpred_model_data) 
+SVCpred_global <- lme(log_difference~habitat+octocoral+stony+relief_cm+nocturnal+position+max_length+cryptic_behaviour+average_depth+colouration+shape+size_bin_lengths, random = list(~1|site, ~1|species_order), SVCpred_model_data) 
 summary(SVCpred_global) 
 # model summary:
 # AIC = 1695.676

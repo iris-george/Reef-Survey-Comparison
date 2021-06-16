@@ -73,7 +73,7 @@ prey_hab <- ggplot(SVCprey_model_data, aes(x = habitat, y = log_difference,
   theme(axis.title = element_text(size = 14)) +
   theme(axis.text= element_text(size = 14)) +
   theme(legend.position = "none") +
-  scale_fill_brewer(palette = "Set3") +
+  scale_fill_manual(values = c("lemonchiffon1", "navyblue")) +
   geom_hline(yintercept = 0,
              linetype = "dashed",
              colour = "grey40")
@@ -115,7 +115,7 @@ prey_cryptic <- ggplot(SVCprey_model_data, aes(x = cryptic_behaviour2,
   theme(axis.title = element_text(size = 14)) +
   theme(axis.text= element_text(size = 14)) +
   theme(legend.position = "none") +
-  scale_fill_brewer(palette = "Set3") +
+  scale_fill_manual(values = c("lemonchiffon1", "navyblue")) +
   geom_hline(yintercept = 0,
              linetype = "dashed",
              colour = "grey40")
@@ -136,6 +136,7 @@ prey_size <- ggplot(SVCprey_model_data, aes(x = size_bin_char,
 ggsave(here("./visuals/SVCprey_size_box.png"), prey_size)
 
 # colouration boxplot
+TukeyHSD(aov(log_difference~colouration, SVCprey_model_data))
 prey_colour <- ggplot(SVCprey_model_data, aes(x = colouration, 
                y = log_difference, fill = colouration)) + 
   geom_boxplot(show.legend = FALSE) + 
@@ -145,7 +146,8 @@ prey_colour <- ggplot(SVCprey_model_data, aes(x = colouration,
   theme(axis.title = element_text(size = 14)) + 
   theme(axis.text= element_text(size = 14)) + 
   theme(legend.position = "none") + 
-  scale_fill_brewer(palette = "YlGnBu") + 
+  scale_fill_manual(name = "Colouration", values = c("goldenrod4", "wheat1", 
+                                                     "gray85", "yellow")) +
   geom_hline(yintercept = 0, linetype = "dashed", colour = "grey40")
 ggsave(here("./visuals/SVCprey_colouration_box.png"), prey_colour)
 
@@ -178,6 +180,7 @@ prey_max <- ggplot(SVCprey_model_data, aes(x = max_length,
 ggsave(here("./visuals/SVCprey_maxlength_scatter.png"), prey_max)
 
 # shape boxplot
+TukeyHSD(aov(log_difference~shape, SVCprey_model_data))
 prey_shape <- ggplot(SVCprey_model_data, aes(x = shape, y = log_difference, 
                                fill = shape)) + 
   geom_boxplot(show.legend = FALSE) + 
@@ -284,6 +287,7 @@ pred_size <- ggplot(SVCpred_model_data, aes(x = size_bin_char,
 ggsave(here("./visuals/SVCpred_size_box.png"), pred_size)
 
 # colouration boxplot
+TukeyHSD(aov(log_difference~colouration, SVCpred_model_data))
 pred_colour <- ggplot(SVCpred_model_data, aes(x = colouration, 
                       y = log_difference, fill = colouration)) + 
   geom_boxplot() +
@@ -293,7 +297,7 @@ pred_colour <- ggplot(SVCpred_model_data, aes(x = colouration,
   theme(axis.text= element_text(size = 14)) +
   theme(legend.position = "none") +
   scale_fill_manual(name = "Colouration", values = c("goldenrod4", "wheat1", 
-                                                     "paleturquoise3")) +
+                                                     "gray85")) +
   geom_hline(yintercept = 0,
              linetype = "dashed",
              colour = "grey40")
