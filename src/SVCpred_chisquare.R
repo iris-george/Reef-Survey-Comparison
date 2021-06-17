@@ -92,6 +92,9 @@ pred_presence$survey <- "roving"
 # bind SVC and roving presence values together 
 SVCroving_presence <- bind_rows(SVC_presence, pred_presence)
 
+# take out 0 rows
+SVCroving_presence <- SVCroving_presence[SVCroving_presence$presence !=0,]
+
 
 # Chi-Square Test ==============================================================
 

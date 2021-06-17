@@ -563,6 +563,7 @@ saveRDS(SVCprey_global_dredge, "SVCprey_global_dredge.rds")
 
 # full model:
 SVCpred_full <- lme(log_difference~habitat+octocoral+stony+relief_cm+nocturnal+max_length+cryptic_behaviour+average_depth+colouration+size_bin_lengths+shape+position, random = list(~1|site, ~1|species_order), SVCpred_model_data) 
+summary(SVCpred_full)
 vif(SVCpred_full)
 
 # Colouration Model:

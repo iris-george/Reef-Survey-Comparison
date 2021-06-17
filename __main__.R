@@ -60,15 +60,23 @@ source(here("./src/model_dataframes.R"))
 source(here("./src/model_selection.R"))
 
 
-# Presence/Absence Comparison ==================================================
+# Chi-Square Analysis: All Species =============================================
 
-# This script creates dataframes of presence/absence recordings of species
+# This script creates a dataframe of presence/absence recordings of species
 # across sessions for SVC and roving surveys in order to compare differences in 
-# recordings. A t-test is used to compare differences in recordings across all 
-# species and Chi-Square tests are used to examine differences in recordings for
-# individual species. 
+# recordings. A Chi-Square test is performed to determine whether a difference
+# between SVC and roving presence recordings exists. A barplot is created of 
+# presence recordings in sessions across the surveys for every species. 
 
-source(here("./src/presabs_analysis.R"))
+source(here("./src/SVCpred_chisquare.R"))
+
+
+# Chi-Square Analysis: Individual Species ======================================
+
+# This script creates a presence/absence recording for each species in each 
+# session for SVC and roving surveys. A Chi-Square test is then performed on 
+# each species in order to determine if a difference in their recordings exists
+# between SVC and roving surveys. 
 
 
 # Covariate Plots ==============================================================
