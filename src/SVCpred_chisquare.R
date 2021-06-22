@@ -43,6 +43,27 @@ SVC_fish <- SVC_fish_data[,c(1,37)]
 # extract roving observations 
 pred_fish <- pred_fish_data[,c(1,3)]
 
+# remove sessions with un-matched dates between surveys
+SVC_fish <- SVC_fish[SVC_fish$session !=178,]
+SVC_fish <- SVC_fish[SVC_fish$session !=179,]
+SVC_fish <- SVC_fish[SVC_fish$session !=180,]
+pred_fish <- pred_fish[pred_fish$session !=178,]
+pred_fish <- pred_fish[pred_fish$session !=179,]
+pred_fish <- pred_fish[pred_fish$session !=180,]
+
+# remove sessions with no roving data
+SVC_fish <- SVC_fish[SVC_fish$session !=264,]
+SVC_fish <- SVC_fish[SVC_fish$session !=265,]
+SVC_fish <- SVC_fish[SVC_fish$session !=266,]
+SVC_fish <- SVC_fish[SVC_fish$session !=267,]
+SVC_fish <- SVC_fish[SVC_fish$session !=268,]
+SVC_fish <- SVC_fish[SVC_fish$session !=269,]
+SVC_fish <- SVC_fish[SVC_fish$session !=270,]
+SVC_fish <- SVC_fish[SVC_fish$session !=271,]
+SVC_fish <- SVC_fish[SVC_fish$session !=272,]
+SVC_fish <- SVC_fish[SVC_fish$session !=273,]
+SVC_fish <- SVC_fish[SVC_fish$session !=274,]
+
 # remove duplicate rows 
 pred_presence <- unique(pred_fish[,1:2])
 
@@ -107,7 +128,69 @@ SVCroving_chi <- table(SVCroving_presence$species,
                        SVCroving_presence$survey)
 
 # Chi-Square Test
-chisq.test(SVCroving_chi)
+SVCroving_full_chi <- chisq.test(SVCroving_chi)
+
+# save Chi-Square results
+saveRDS(SVCroving_full_chi, here("./outputs/SVCpred_full_chi.rds"))
+
+
+# Chi-Square Test: Species Subset ==============================================
+
+# remove species present in <10% of sessions 
+SVCroving_presence_subset <- SVCroving_presence[SVCroving_presence$species 
+                                                !="goldentail moray",]
+SVCroving_presence_subset <- 
+  SVCroving_presence_subset[SVCroving_presence_subset$species 
+                             !="sharptail eel",]
+SVCroving_presence_subset <- 
+  SVCroving_presence_subset[SVCroving_presence_subset$species 
+                             !="amberjack",]
+SVCroving_presence_subset <- 
+  SVCroving_presence_subset[SVCroving_presence_subset$species 
+                             !="red hind",]
+SVCroving_presence_subset <- 
+  SVCroving_presence_subset[SVCroving_presence_subset$species 
+                             !="rock hind",]
+SVCroving_presence_subset <- 
+  SVCroving_presence_subset[SVCroving_presence_subset$species 
+                             !="greater soapfish",]
+SVCroving_presence_subset <- 
+  SVCroving_presence_subset[SVCroving_presence_subset$species 
+                             !="scamp",]
+SVCroving_presence_subset <- 
+  SVCroving_presence_subset[SVCroving_presence_subset$species 
+                             !="black margate",]
+SVCroving_presence_subset <- 
+  SVCroving_presence_subset[SVCroving_presence_subset$species 
+                             !="cubera snapper",]
+SVCroving_presence_subset <- 
+  SVCroving_presence_subset[SVCroving_presence_subset$species 
+                             !="barracuda",]
+SVCroving_presence_subset <- 
+  SVCroving_presence_subset[SVCroving_presence_subset$species 
+                             !="spotted scorpionfish",]
+
+# convert dataframe to table
+SVCroving_chi_subset <- table(SVCroving_presence_subset$species, 
+                       SVCroving_presence_subset$survey)
+
+# Chi-Square Test
+chisq.test(SVCroving_chi_subset)
+
+# remove purplemouth moray (>10% of sessions but 0 presence on SVC)
+SVCroving_presence_subset2 <- 
+  SVCroving_presence_subset[SVCroving_presence_subset$species 
+                            !="purplemouth moray",]
+
+# convert dataframe to table
+SVCroving_chi_subset2 <- table(SVCroving_presence_subset2$species, 
+                              SVCroving_presence_subset2$survey)
+
+# Chi-Square Test
+SVCroving_chi_sub <- chisq.test(SVCroving_chi_subset2)
+
+# save Chi-Square results
+saveRDS(SVCroving_chi_sub, here("./outputs/SVCpred_chi_subset.rds"))
 
 
 # Barplot ======================================================================
@@ -133,28 +216,9 @@ SVCroving_presence$species <- factor(SVCroving_presence$species,
 # aggregate presence by sum
 SVCroving_presence_bar <- aggregate(.~species+survey, SVCroving_presence, sum)
 
-# significance stars
-significance1 <- data.frame(Group = c("goldentail moray", "red hind", 
-                                     "greater soapfish", 
-                                     "spotted scorpionfish"),
-                           Value = c(10,10,10,12))
-significance2 <- data.frame(Group = c("purplemouth moray"),
-                            Value = c(18))
-significance3 <- data.frame(Group = c("green moray", "spotted moray", 
-                                      "black grouper", "gag grouper", 
-                                      "nassau grouper", "red grouper",  
-                                      "lionfish", "trumpetfish"),
-                            Value = c(23,60,43,30,24,38,40,30))
-
-significance <- data.frame(Group = c("goldentail moray", "red hind", 
-                                     "greater soapfish", "spotted scorpionfish",
-                                     "purplemouth moray", "green moray", 
-                                     "spotted moray", "black grouper", 
-                                     "gag grouper", "nassau grouper", 
-                                     "red grouper", "lionfish", "trumpetfish"),
-                           Value = c(10,10,10,12,18,23,60,43,30,24,38,40,30))
-
-# * = 0.05, ** = 0.01, *** = 0..001
+# sort by species
+SVCroving_presence_bar <- 
+  SVCroving_presence_bar[order(SVCroving_presence_bar$species),]
 
 # barplot
 SVCpred_presabs_bar <- ggplot(SVCroving_presence_bar, aes(x = species, 

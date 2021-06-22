@@ -164,17 +164,3 @@ summary(SVCpred_confidence)
 
 # save confidence intervals
 saveRDS(SVCpred_confidence, here("./outputs/SVCpred_dredge_CI.rds"))
-
-SVCprey_species <- unique(SVCprey_model_data$species)
-length(SVCprey_species)
-SVCprey_families <- unique(SVCprey_model_data$family)
-length(SVCprey_families)
-SVCprey_sessions <- unique(SVCprey_model_data$session)
-length(SVCprey_sessions)
-
-SVCpred_species <- unique(SVCpred_model_data$species)
-length(SVCpred_species)
-SVCpred_families <- unique(SVCpred_model_data$family)
-length(SVCpred_families)
-SVCpred_sessions <- unique(SVCpred_model_data$session)
-length(SVCpred_sessions)

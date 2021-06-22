@@ -43,6 +43,11 @@ pred_sessions <- pred_fish[,1]
 # remove duplicate sessions 
 pred_sessions <- unique(pred_sessions[,1])
 
+# remove un-matching dates
+pred_sessions <- pred_sessions[pred_sessions$session !=178,]
+pred_sessions <- pred_sessions[pred_sessions$session !=179,]
+pred_sessions <- pred_sessions[pred_sessions$session !=180,]
+
 # add species column for goldentail moray
 goldentail_moray <- pred_sessions
 goldentail_moray$species <- "goldentail moray"
@@ -77,8 +82,11 @@ goldentail_moray_chi <- table(goldentail_moray_chi$presence,
                               goldentail_moray_chi$survey)
 
 # chi-square test
-chisq.test(goldentail_moray_chi) 
-# X-squared = 6.3629, df = 1, p-value = 0.01165
+goldentail_moray_result <- chisq.test(goldentail_moray_chi) 
+# X-squared = 5.322, df = 1, p-value = 0.02106
+
+# save chi-square results
+saveRDS(goldentail_moray_result, here("./outputs/goldentail_moray_chi.rds"))
 
 
 # Chi-Square Test: Green Moray =================================================
@@ -118,8 +126,11 @@ green_moray_chi[is.na(green_moray_chi)] <- 0
 green_moray_chi <- table(green_moray_chi$presence, green_moray_chi$survey)
 
 # chi-square test
-chisq.test(green_moray_chi) 
-# X-squared = 18.289, df = 1, p-value = 1.898e-05
+green_moray_result <- chisq.test(green_moray_chi) 
+# X-squared = 15.987, df = 1, p-value = 6.377e-05
+
+# save chi-square results
+saveRDS(green_moray_result, here("./outputs/green_moray_chi.rds"))
 
 
 # Chi-Square Test: Purplemouth Moray ===========================================
@@ -162,8 +173,11 @@ purplemouth_moray_chi <- table(purplemouth_moray_chi$presence,
                                purplemouth_moray_chi$survey)
 
 # chi-square test
-chisq.test(purplemouth_moray_chi) 
-# X-squared = 10.682, df = 1, p-value = 0.001082
+purplemouth_moray_result <- chisq.test(purplemouth_moray_chi) 
+# X-squared = 10.701, df = 1, p-value = 0.001071
+
+# save chi-square results
+saveRDS(purplemouth_moray_result, here("./outputs/purplemouth_moray_chi.rds"))
 
 
 # Chi-Square Test: Spotted Moray ===============================================
@@ -203,8 +217,11 @@ spotted_moray_chi[is.na(spotted_moray_chi)] <- 0
 spotted_moray_chi <- table(spotted_moray_chi$presence, spotted_moray_chi$survey)
 
 # chi-square test
-chisq.test(spotted_moray_chi) 
-# X-squared = 55.608, df = 1, p-value = 8.848e-14
+spotted_moray_result <- chisq.test(spotted_moray_chi) 
+# X-squared = 51.136, df = 1, p-value = 8.618e-13
+
+# save chi-square results
+saveRDS(spotted_moray_result, here("./outputs/spotted_moray_chi.rds"))
 
 
 # Chi-Square Test: Sharptail Eel ===============================================
@@ -244,8 +261,11 @@ sharptail_eel_chi[is.na(sharptail_eel_chi)] <- 0
 sharptail_eel_chi <- table(sharptail_eel_chi$presence, sharptail_eel_chi$survey)
 
 # chi-square test
-chisq.test(sharptail_eel_chi) 
-# X-squared = 0.50472, df = 1, p-value = 0.4774
+sharptail_eel_result <- chisq.test(sharptail_eel_chi) 
+# X-squared = 0.50485, df = 1, p-value = 0.4774
+
+# save chi-square results
+saveRDS(sharptail_eel_result, here("./outputs/sharptail_eel_chi.rds"))
 
 
 # Chi-Square Test: Amberjack =================================================
@@ -326,8 +346,11 @@ black_grouper_chi[is.na(black_grouper_chi)] <- 0
 black_grouper_chi <- table(black_grouper_chi$presence, black_grouper_chi$survey)
 
 # chi-square test
-chisq.test(black_grouper_chi) 
-# X-squared = 19.025, df = 1, p-value = 1.29e-05
+black_grouper_result <- chisq.test(black_grouper_chi) 
+# X-squared = 18.047, df = 1, p-value = 2.155e-05
+
+# save chi-square results
+saveRDS(black_grouper_result, here("./outputs/black_grouper_chi.rds"))
 
 
 # Chi-Square Test: Coney =======================================================
@@ -367,8 +390,11 @@ coney_chi[is.na(coney_chi)] <- 0
 coney_chi <- table(coney_chi$presence, coney_chi$survey)
 
 # chi-square test
-chisq.test(coney_chi) 
-# X-squared = 2.3004, df = 1, p-value = 0.1293
+coney_result <- chisq.test(coney_chi) 
+# X-squared = 2.3061, df = 1, p-value = 0.1289
+
+# save chi-square results
+saveRDS(coney_result, here("./outputs/coney_chi.rds"))
 
 
 # Chi-Square Test: Gag Grouper =================================================
@@ -408,8 +434,11 @@ gag_grouper_chi[is.na(gag_grouper_chi)] <- 0
 gag_grouper_chi <- table(gag_grouper_chi$presence, gag_grouper_chi$survey)
 
 # chi-square test
-chisq.test(gag_grouper_chi) 
-# X-squared = 12.653, df = 1, p-value = 0.000375
+gag_grouper_result <- chisq.test(gag_grouper_chi) 
+# X-squared = 12.703, df = 1, p-value = 0.000365
+
+# save chi-square results
+saveRDS(gag_grouper_result, here("./outputs/gag_grouper_chi.rds"))
 
 
 # Chi-Square Test: Graysby =====================================================
@@ -449,8 +478,11 @@ graysby_chi[is.na(graysby_chi)] <- 0
 graysby_chi <- table(graysby_chi$presence, graysby_chi$survey)
 
 # chi-square test
-chisq.test(graysby_chi) 
-# X-squared = 1.8856, df = 1, p-value = 0.1697
+graysby_result <- chisq.test(graysby_chi) 
+# X-squared = 1.567, df = 1, p-value = 0.2106
+
+# save chi-square results
+saveRDS(graysby_result, here("./outputs/graysby_chi.rds"))
 
 
 # Chi-Square Test: Nassau Grouper ==============================================
@@ -491,8 +523,11 @@ nassau_grouper_chi <- table(nassau_grouper_chi$presence,
                             nassau_grouper_chi$survey)
 
 # chi-square test
-chisq.test(nassau_grouper_chi) 
-# X-squared = 19.911, df = 1, p-value = 8.114e-06
+nassau_grouper_result <- chisq.test(nassau_grouper_chi) 
+# X-squared = 19.97, df = 1, p-value = 7.866e-06
+
+# save chi-square results
+saveRDS(nassau_grouper_result, here("./outputs/nassau_grouper_chi.rds"))
 
 
 # Chi-Square Test: Red Grouper =================================================
@@ -532,8 +567,11 @@ red_grouper_chi[is.na(red_grouper_chi)] <- 0
 red_grouper_chi <- table(red_grouper_chi$presence, red_grouper_chi$survey)
 
 # chi-square test
-chisq.test(red_grouper_chi) 
-# X-squared = 12.617, df = 1, p-value = 0.0003823
+red_grouper_result <- chisq.test(red_grouper_chi) 
+# X-squared = 12.712, df = 1, p-value = 0.0003634
+
+# save chi-square results
+saveRDS(red_grouper_result, here("./outputs/red_grouper_chi.rds"))
 
 
 # Chi-Square Test: Red Hind ====================================================
@@ -573,8 +611,11 @@ red_hind_chi[is.na(red_hind_chi)] <- 0
 red_hind_chi <- table(red_hind_chi$presence, red_hind_chi$survey)
 
 # chi-square test
-chisq.test(red_hind_chi) 
-# X-squared = 5.3168, df = 1, p-value = 0.02112
+red_hind_result <- chisq.test(red_hind_chi) 
+# X-squared = 5.322, df = 1, p-value = 0.02106
+
+# save chi-square results
+saveRDS(red_hind_result, here("./outputs/red_hind_chi.rds"))
 
 
 # Chi-Square Test: Rock Hind ===================================================
@@ -614,8 +655,11 @@ rock_hind_chi[is.na(rock_hind_chi)] <- 0
 rock_hind_chi <- table(rock_hind_chi$presence, rock_hind_chi$survey)
 
 # chi-square test
-chisq.test(rock_hind_chi)
-# X-squared = 0.81914, df = 1, p-value = 0.3654
+rock_hind_result <- chisq.test(rock_hind_chi)
+# X-squared = 0.8197, df = 1, p-value = 0.3653
+
+# save chi-square results
+saveRDS(rock_hind_result, here("./outputs/rock_hind_chi.rds"))
 
 
 # Chi-Square Test: Greater Soapfish ============================================
@@ -656,8 +700,11 @@ greater_soapfish_chi <- table(greater_soapfish_chi$presence,
                             greater_soapfish_chi$survey)
 
 # chi-square test
-chisq.test(greater_soapfish_chi) 
-# X-squared = 4.2869, df = 1, p-value = 0.03841
+greater_soapfish_result <- chisq.test(greater_soapfish_chi) 
+# X-squared = 4.2904, df = 1, p-value = 0.03833
+
+# save chi-square results
+saveRDS(greater_soapfish_result, here("./outputs/greater_soapfish_chi.rds"))
 
 
 # Chi-Square Test: Scamp =======================================================
@@ -824,8 +871,11 @@ mutton_snapper_chi <- table(mutton_snapper_chi$presence,
                             mutton_snapper_chi$survey)
 
 # chi-square test
-chisq.test(mutton_snapper_chi) 
-# X-squared = 0.83489, df = 1, p-value = 0.3609
+mutton_snapper_result <- chisq.test(mutton_snapper_chi) 
+# X-squared = 0.83979, df = 1, p-value = 0.3595
+
+# save chi-square results
+saveRDS(mutton_snapper_result, here("./outputs/mutton_snapper_chi.rds"))
 
 
 # Chi-Square Test: Barracuda ===================================================
@@ -865,8 +915,8 @@ barracuda_chi[is.na(barracuda_chi)] <- 0
 barracuda_chi <- table(barracuda_chi$presence, barracuda_chi$survey)
 
 # chi-square test
-chisq.test(barracuda_chi) 
-# X-squared = 0.076429, df = 1, p-value = 0.7822
+barracuda_result <- chisq.test(barracuda_chi) 
+# X-squared = 0, df = 1, p-value = 1
 
 
 # Chi-Square Test: Lionfish ====================================================
@@ -906,8 +956,11 @@ lionfish_chi[is.na(lionfish_chi)] <- 0
 lionfish_chi <- table(lionfish_chi$presence, lionfish_chi$survey)
 
 # chi-square test
-chisq.test(lionfish_chi) 
-# X-squared = 27.154, df = 1, p-value = 1.879e-07
+lionfish_result <- chisq.test(lionfish_chi) 
+# X-squared = 26.031, df = 1, p-value = 3.36e-07
+
+# save chi-square results
+saveRDS(lionfish_result, here("./outputs/lionfish_chi.rds"))
 
 
 # Chi-Square Test: Spotted Scorpionfish ========================================
@@ -951,8 +1004,12 @@ spotted_scorpionfish_chi <- table(spotted_scorpionfish_chi$presence,
                                   spotted_scorpionfish_chi$survey)
 
 # chi-square test
-chisq.test(spotted_scorpionfish_chi) 
-# X-squared = 4.1756, df = 1, p-value = 0.04101
+spotted_scorpionfish_result <- chisq.test(spotted_scorpionfish_chi) 
+# X-squared = 4.1809, df = 1, p-value = 0.04088
+
+# save chi-square results
+saveRDS(spotted_scorpionfish_result,
+        here("./outputs/spotted_scorpionfish_chi.rds"))
 
 
 # Chi-Square Test: Trumpetfish =================================================
@@ -992,5 +1049,8 @@ trumpetfish_chi[is.na(trumpetfish_chi)] <- 0
 trumpetfish_chi <- table(trumpetfish_chi$presence, trumpetfish_chi$survey)
 
 # chi-square test
-chisq.test(trumpetfish_chi) 
-# X-squared = 26.964, df = 1, p-value = 2.072e-07
+trumpetfish_result <- chisq.test(trumpetfish_chi) 
+# X-squared = 24.516, df = 1, p-value = 7.371e-07
+
+# save chi-square results
+saveRDS(trumpetfish_result, here("./outputs/trumpetfish_chi.rds"))

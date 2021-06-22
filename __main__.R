@@ -78,6 +78,8 @@ source(here("./src/SVCpred_chisquare.R"))
 # each species in order to determine if a difference in their recordings exists
 # between SVC and roving surveys. 
 
+source(here("./src/SVCpred_species_presence.R"))
+
 
 # Covariate Plots ==============================================================
 

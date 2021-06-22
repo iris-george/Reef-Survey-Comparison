@@ -283,12 +283,14 @@ SVCpred_data <- SVCpred_data[SVCpred_data$species !="gray snapper",]
 SVCpred_data <- SVCpred_data[SVCpred_data$species !="amberjack",]
 
 # remove black margate (only compressiform species)
-SVCpred_data <- SVCpred_data[SVCpred_data$species !="black margate",]
+# SVCpred_data <- SVCpred_data[SVCpred_data$species !="black margate",]
 
 # remove sessions with un-matched dates between surveys
 SVCpred_data <- SVCpred_data[SVCpred_data$session !=178,]
 SVCpred_data <- SVCpred_data[SVCpred_data$session !=179,]
 SVCpred_data <- SVCpred_data[SVCpred_data$session !=180,]
+
+# remove sessions with no roving data
 SVCpred_data <- SVCpred_data[SVCpred_data$session !=264,]
 SVCpred_data <- SVCpred_data[SVCpred_data$session !=265,]
 SVCpred_data <- SVCpred_data[SVCpred_data$session !=266,]
@@ -300,6 +302,9 @@ SVCpred_data <- SVCpred_data[SVCpred_data$session !=271,]
 SVCpred_data <- SVCpred_data[SVCpred_data$session !=272,]
 SVCpred_data <- SVCpred_data[SVCpred_data$session !=273,]
 SVCpred_data <- SVCpred_data[SVCpred_data$session !=274,]
+
+# remove NA values
+SVCpred_data <- na.omit(SVCpred_data) 
 
 
 # Density Log Transformation ===================================================
