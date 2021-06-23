@@ -199,9 +199,6 @@ saveRDS(SVCroving_chi_sub, here("./outputs/SVCpred_chi_subset.rds"))
 # recorded in between SVC and roving surveys. 
 
 # re-order species
-SVCprey_model_data$colouration <- 
-  factor(SVCprey_model_data$colouration, 
-         levels = c("camouflage", "neutral", "silvering", "colourful"))
 SVCroving_presence$species <- factor(SVCroving_presence$species, 
                               levels = c("goldentail moray", "green moray", 
                               "purplemouth moray", "spotted moray", 
@@ -216,6 +213,30 @@ SVCroving_presence$species <- factor(SVCroving_presence$species,
 # aggregate presence by sum
 SVCroving_presence_bar <- aggregate(.~species+survey, SVCroving_presence, sum)
 
+# add 0 species
+goldentail_SVC <- data.frame("goldentail moray", "SVC", 0)
+names(goldentail_SVC) <- c("species", "survey", "presence")
+purplemouth_SVC <- data.frame("purplemouth moray", "SVC", 0)
+names(purplemouth_SVC) <- c("species", "survey", "presence")
+sharptail_SVC <- data.frame("sharptail eel", "SVC", 0)
+names(sharptail_SVC) <- c("species", "survey", "presence")
+amberjack_SVC <- data.frame("amberjack", "SVC", 0)
+names(amberjack_SVC) <- c("species", "survey", "presence")
+nassau_SVC <- data.frame("nassau grouper", "SVC", 0)
+names(nassau_SVC) <- c("species", "survey", "presence")
+redhind_SVC <- data.frame("red hind", "SVC", 0)
+names(redhind_SVC) <- c("species", "survey", "presence")
+soapfish_SVC <- data.frame("greater soapfish", "SVC", 0)
+names(soapfish_SVC) <- c("species", "survey", "presence")
+scamp_SVC <- data.frame("scamp", "SVC", 0)
+names(scamp_SVC) <- c("species", "survey", "presence")
+cubera_SVC <- data.frame("cubera snapper", "SVC", 0)
+names(cubera_SVC) <- c("species", "survey", "presence")
+SVCroving_presence_bar <- rbind(SVCroving_presence_bar, goldentail_SVC, 
+                                purplemouth_SVC, sharptail_SVC, amberjack_SVC, 
+                                nassau_SVC, redhind_SVC, soapfish_SVC, 
+                                scamp_SVC, cubera_SVC)
+
 # sort by species
 SVCroving_presence_bar <- 
   SVCroving_presence_bar[order(SVCroving_presence_bar$species),]
@@ -228,9 +249,9 @@ SVCpred_presabs_bar <- ggplot(SVCroving_presence_bar, aes(x = species,
   xlab("Species") + 
   ylab("Number of Sessions Present") +
   scale_fill_manual(values = c("lemonchiffon1", "navyblue")) +
-  theme(axis.title = element_text(size = 20)) +
-  theme(axis.text = element_text(size = 14)) +
+  theme(axis.title = element_text(size = 24)) +
+  theme(axis.text = element_text(size = 22)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-  theme(legend.text = element_text(size = 18)) +
-  theme(legend.title = element_text(size = 20)) 
+  theme(legend.text = element_text(size = 22)) +
+  theme(legend.title = element_text(size = 24)) 
 ggsave(here("./visuals/SVCpred_presabs_bar.png"), SVCpred_presabs_bar)

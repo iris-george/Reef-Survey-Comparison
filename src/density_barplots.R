@@ -246,11 +246,14 @@ SVCpred_bar <- SVCpred_bar[SVCpred_bar$species !=0,]
 # remove silversides (Atherinopsidae), trumpetfish (Aulostomidae), eels 
 # (Muraenidae and Ophichthidae), and flounder (Bothidae) from SVC vs. transect 
 # data
-SVCprey_family <- SVCprey_family[c(1:2,5:6,8:24,27:38),] 
+# SVCprey_family <- SVCprey_family[c(1:2,5:6,8:24,27:38),] 
+SVCprey_family <- SVCprey_family[c(1:2,4:38),] 
+SVCprey_family <- na.omit(SVCprey_family)
 
 # remove trumpetfish, gray snapper, amberjack, and black margate from SVC vs. 
 # roving data
-SVCpred_bar <- SVCpred_bar[c(2:3,5:8,10:23),]
+# SVCpred_bar <- SVCpred_bar[c(2:3,5:8,10:23),]
+SVCpred_bar <- SVCpred_bar[c(1:8,10:23),]
 
 
 # Density Difference Barplots ==================================================
@@ -265,8 +268,8 @@ SVCprey_barplot <- ggplot(data=SVCprey_family,
   geom_bar(stat="identity", fill="lightseagreen", color = "black") +
   theme_classic() + xlab("Family") + 
   ylab(bquote("Mean Density Difference" (individuals/m^2))) +
-  theme(axis.title = element_text(size = 20)) +
-  theme(axis.text= element_text(size = 14)) +
+  theme(axis.title = element_text(size = 24)) +
+  theme(axis.text= element_text(size = 22)) +
   theme(legend.text = element_text(size = 18)) +
   theme(legend.title = element_text(size = 20)) 
 SVCprey_bar <- SVCprey_barplot + coord_flip() +
@@ -279,8 +282,8 @@ SVCpred_barplot <- ggplot(data=SVCpred_bar, aes(x=species, y=avg_density_dif)) +
   theme_classic() + 
   xlab("Species") + 
   ylab(bquote("Mean Density Difference" (individuals/m^2))) +
-  theme(axis.title = element_text(size = 20)) +
-  theme(axis.text= element_text(size = 14)) +
+  theme(axis.title = element_text(size = 24)) +
+  theme(axis.text= element_text(size = 22)) +
   theme(legend.text = element_text(size = 18)) +
   theme(legend.title = element_text(size = 20)) 
 SVCpred_bar2 <- SVCpred_barplot + coord_flip() +
