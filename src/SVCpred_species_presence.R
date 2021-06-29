@@ -1,4 +1,4 @@
-########## SURVEY COMPARISON PROJECT PRESENCE/ABSENCE COMPARISON ##########
+########## SURVEY COMPARISON PROJECT SVC VS. ROVING CHI SQUARE ##########
 ########## 
 ##########
 # This file creates performs Chi-Square Tests on presence/absence values for 

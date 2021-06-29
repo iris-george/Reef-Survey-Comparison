@@ -1,4 +1,4 @@
-########## SURVEY COMPARISON PROJECT PRESENCE/ABSENCE COMPARISON ##########
+########## SURVEY COMPARISON PROJECT SVC VS. ROVING PRESENCE ANALYSIS ##########
 ########## 
 ##########
 # This file creates a dataframe outlining the total number of sessions each 

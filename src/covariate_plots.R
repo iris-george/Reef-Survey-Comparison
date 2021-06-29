@@ -215,6 +215,7 @@ prey_sizecol <- ggplot(SVCprey_model_data, aes(colouration, log_difference,
 ggsave(here("./visuals/SVCprey_sizecolour_box.png"), prey_sizecol)
 
 # shape*size bin boxplot
+options(max.print = 10000)
 TukeyHSD(aov(log_difference~shape*size_bin_char, SVCprey_model_data))
 prey_sizesha <- ggplot(SVCprey_model_data, aes(shape, log_difference, 
                                fill = size_bin_char)) + 
