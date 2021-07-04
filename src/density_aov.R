@@ -115,11 +115,17 @@ SVCprey_density <- na.omit(survey_density)
 # The following performs an ANOVA across all SVC focal species to determine
 # differences in their average densities between survey types.
 
-# ANOVA
+# one-way ANOVA
 survey_density_anova <- aov(density~survey, survey_density)
 
-# Tukey Test 
+# one-way Tukey Test 
 TukeyHSD(survey_density_anova)
+
+# two-way ANOVA
+twoway_density_aov <- aov(density~survey+species, survey_density)
+
+# two-way Tukey Test
+TukeyHSD(twoway_density_aov)
 
 
 # ANOVA Across Focal Species ===================================================

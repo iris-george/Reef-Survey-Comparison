@@ -246,13 +246,11 @@ SVCpred_bar <- SVCpred_bar[SVCpred_bar$species !=0,]
 # remove silversides (Atherinopsidae), trumpetfish (Aulostomidae), eels 
 # (Muraenidae and Ophichthidae), and flounder (Bothidae) from SVC vs. transect 
 # data
-# SVCprey_family <- SVCprey_family[c(1:2,5:6,8:24,27:38),] 
 SVCprey_family <- SVCprey_family[c(1:2,4:38),] 
 SVCprey_family <- na.omit(SVCprey_family)
 
 # remove trumpetfish, gray snapper, amberjack, and black margate from SVC vs. 
 # roving data
-# SVCpred_bar <- SVCpred_bar[c(2:3,5:8,10:23),]
 SVCpred_bar <- SVCpred_bar[c(1:8,10:23),]
 
 

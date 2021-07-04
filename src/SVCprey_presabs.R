@@ -42,18 +42,6 @@ SVC_fish <- SVC_fish_data[,c(1,37)]
 # extract transect observations 
 prey_fish <- prey_fish_data[,c(1,3)]
 
-# filter for SVC focal species
-SVC_fish <- filter(SVC_fish, species == "white grunt"|
-                     species == "bluestriped grunt"|species == "hogfish"|
-                     species == "mutton snapper"|species == "gray snapper"|
-                     species == "yellowtail snapper"|species == "red grouper"|
-                     species == "black grouper")
-prey_fish <- filter(prey_fish, species == "white grunt"|
-                     species == "bluestriped grunt"|species == "hogfish"|
-                     species == "mutton snapper"|species == "gray snapper"|
-                     species == "yellowtail snapper"|species == "red grouper"|
-                     species == "black grouper")
-
 # remove sessions with un-matched dates between surveys
 SVC_fish <- SVC_fish[SVC_fish$session !=178,]
 SVC_fish <- SVC_fish[SVC_fish$session !=179,]
@@ -83,7 +71,7 @@ prey_presence$survey <- "transect"
 SVCprey_presence <- bind_rows(SVC_presence, prey_presence)
 
 
-# Chi-Square Test ==============================================================
+# Full Chi-Square Test =========================================================
 
 # The following performs a Chi-Square Test on the number of sessions present
 # across species between SVC and transect surveys to determine if an overall
@@ -98,6 +86,22 @@ SVCprey_full_chi <- chisq.test(SVCprey_chi)
 
 # save Chi-Square results
 saveRDS(SVCprey_full_chi, here("./outputs/SVCprey_full_chi.rds"))
+
+
+# Focal Chi-Square Test ========================================================
+
+focal_SVCprey_pres <- filter(SVCprey_presence, species == "white grunt"|
+                      species == "bluestriped grunt"|species == "hogfish"|
+                      species == "mutton snapper"|species == "yellowtail snapper"|
+                      species == "gray snapper"|species == "red grouper"|
+                      species == "black grouper")
+
+# convert dataframe to table
+focal_SVCprey_chi <- table(focal_SVCprey_pres$species, 
+                     focal_SVCprey_pres$survey)
+
+# Chi-Square Test
+SVCprey_focal_chi <- chisq.test(focal_SVCprey_chi)
 
 
 # Chi-Square Test: White Grunt =================================================

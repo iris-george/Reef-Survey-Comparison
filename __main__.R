@@ -60,7 +60,22 @@ source(here("./src/model_dataframes.R"))
 source(here("./src/model_selection.R"))
 
 
-# Chi-Square Analysis: All Species =============================================
+# Density Comparison ===========================================================
+
+source(here("./src/density_comparison.R"))
+
+
+# SVC vs. Transect: Presence/Absence Comparison ================================
+
+source(here("./src/SVCprey_presabs.R"))
+
+
+# SVC vs. Transect: Focal Species Density Comparison ===========================
+
+source(here("./src/SVCprey_density.R"))
+
+
+# SVC vs. Roving: Presence/Absence Comparison ==================================
 
 # This script creates a dataframe of presence/absence recordings of species
 # across sessions for SVC and roving surveys in order to compare differences in 
@@ -71,14 +86,9 @@ source(here("./src/model_selection.R"))
 source(here("./src/SVCpred_chisquare.R"))
 
 
-# Chi-Square Analysis: Individual Species ======================================
+# SVC vs. Roving: Focal Species Density Comparison =============================
 
-# This script creates a presence/absence recording for each species in each 
-# session for SVC and roving surveys. A Chi-Square test is then performed on 
-# each species in order to determine if a difference in their recordings exists
-# between SVC and roving surveys. 
-
-source(here("./src/SVCpred_species_presence.R"))
+source(here("./src/SVCpred_density.R"))
 
 
 # Covariate Plots ==============================================================
