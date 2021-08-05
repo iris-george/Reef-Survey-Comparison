@@ -1,12 +1,13 @@
 ########## SURVEY COMPARISON PROJECT SVC VS. ROVING DENSITY COMPARISON #########
 ########## 
 ##########
-# This file creates a dataframe outlining the density of 8 RVC focal species in 
-# each session between SVC and roving surveys. The dataframe created is used 
-# to compare average densities of each species between surveys using an ANOVA, 
-# as well as average densities of each species individually using ANOVAs. A 
-# barplot of the average recorded density for each species in SVC and roving 
-# surveys is also created. 
+# This file creates a dataframe outlining the average density of 3 RVC focal 
+# species which were recorded in both SVC and roving surveys in within each 
+# session between SVC and roving surveys. The dataframe created is used to 
+# compare average densities of each species between surveys as well as average 
+# densities of each species individually using Kruskal-Wallis one-way analysis 
+# of variance tests. A barplot of the average recorded density for each species 
+# in SVC and roving surveys is also created. 
 ##########
 ##########
 # AUTHOR: Iris M. George
@@ -37,10 +38,10 @@ pred_meta <- read_csv(here("./clean_data/pred_metadata.csv"))
 # filter for SVC focal species
 SVC_data <- filter(SVC_data, species == "mutton snapper"|
                      species == "red grouper"|
-                     species == "black grouper")
+                     species == "black grouper"|species == "lionfish")
 pred_fish <- filter(pred_fish, species == "mutton snapper"|
                      species == "red grouper"|
-                     species == "black grouper")
+                     species == "black grouper"|species == "lionfish")
 
 # select roving species and session columns
 pred_species <- pred_fish[,c(1,3)]
@@ -102,15 +103,15 @@ with(SVCpred_density, shapiro.test(density[survey == "roving"]))
 
 # kruskal-wallis test
 SVCpred_density_kruskal <- kruskal.test(density~survey, data = SVCpred_density)
-# Kruskal-Wallis chi-squared = 76.198, df = 1, p-value < 2.2e-16
+# Kruskal-Wallis chi-squared = 91.044, df = 1, p-value < 2.2e-16
 
 # average SVC density 
 mean(SVCpred_density$density[SVCpred_density$survey == "SVC"])
-# 0.01462998
+# 0.01646725
 
 # average roving density 
 mean(SVCpred_density$density[SVCpred_density$survey == "roving"])
-# 0.001763864
+# 0.001850097
 
 
 # Mutton Snapper ANOVA =========================================================
@@ -126,7 +127,8 @@ with(mutton_snapper_density, shapiro.test(density[survey == "SVC"]))
 with(mutton_snapper_density, shapiro.test(density[survey == "roving"]))
 
 # kruskal-wallis test
-mutton_snapper_density_kruskal <- kruskal.test(density~survey, data = mutton_snapper_density)
+mutton_snapper_density_kruskal <- kruskal.test(density~survey, 
+                                               data = mutton_snapper_density)
 # Kruskal-Wallis chi-squared = 28.832, df = 1, p-value = 7.894e-08
 
 # average SVC density 
@@ -151,7 +153,8 @@ with(red_grouper_density, shapiro.test(density[survey == "SVC"]))
 with(red_grouper_density, shapiro.test(density[survey == "roving"]))
 
 # kruskal-wallis test
-red_grouper_density_kruskal <- kruskal.test(density~survey, data = red_grouper_density)
+red_grouper_density_kruskal <- kruskal.test(density~survey, 
+                                            data = red_grouper_density)
 # Kruskal-Wallis chi-squared = 20.208, df = 1, p-value = 6.947e-06
 
 # average SVC density 
@@ -176,7 +179,8 @@ with(black_grouper_density, shapiro.test(density[survey == "SVC"]))
 with(black_grouper_density, shapiro.test(density[survey == "roving"]))
 
 # kruskal-wallis test
-black_grouper_density_kruskal <- kruskal.test(density~survey, data = black_grouper_density)
+black_grouper_density_kruskal <- kruskal.test(density~survey, 
+                                              data = black_grouper_density)
 # Kruskal-Wallis chi-squared = 29.447, df = 1, p-value = 5.746e-08
 
 # average SVC density 
@@ -186,6 +190,32 @@ mean(black_grouper_density$density[black_grouper_density$survey == "SVC"])
 # average roving density 
 mean(black_grouper_density$density[black_grouper_density$survey == "roving"])
 # 0.001088917
+
+
+# Lionfish ANOVA ===============================================================
+
+# The following performs an ANOVA on the average density of lionfish 
+# observed between SVC and roving surveys. 
+
+# filter for lionfish
+lionfish_density <- filter(SVCpred_density, species == "lionfish")
+
+# shapiro-wilk normality test
+with(lionfish_density, shapiro.test(density[survey == "SVC"]))
+with(lionfish_density, shapiro.test(density[survey == "roving"]))
+
+# kruskal-wallis test
+lionfish_density_kruskal <- kruskal.test(density~survey, 
+                                              data = lionfish_density)
+# Kruskal-Wallis chi-squared = 12.426, df = 1, p-value = 0.0004233
+
+# average SVC density 
+mean(lionfish_density$density[lionfish_density$survey == "SVC"])
+# 0.03116534
+
+# average roving density 
+mean(lionfish_density$density[lionfish_density$survey == "roving"])
+# 0.002072866
 
 
 # Density Barplot ==============================================================
@@ -202,17 +232,22 @@ SVCpred_density_bar <- aggregate(.~species+survey, SVCpred_density_bar, mean)
 # sort by species
 SVCpred_density_bar <- SVCpred_density_bar[order(SVCpred_density_bar$species),]
 
+# re-order surveys
+SVCpred_density_bar$survey <- factor(SVCpred_density_bar$survey, 
+                                     levels = c("SVC", "roving"))
+
 # barplot
 SVCpred_density_barplot <- ggplot(SVCpred_density_bar, aes(x = species, 
-                                                           y = density, fill = survey)) +
+                           y = density, fill = survey)) +
   geom_bar(position = "dodge", stat = "identity", color = "black") +
   theme_classic() +
   xlab("Species") + 
-  ylab("Average Density") +
-  scale_fill_manual(values = c("lemonchiffon1", "navyblue")) +
+  ylab(bquote("Log Density Difference " (individuals/m^2))) +
+  # scale_fill_manual(values = c("gray88", "gray44")) +
+  scale_fill_brewer(palette = "YlGnBu") +
   theme(axis.title = element_text(size = 24)) +
   theme(axis.text = element_text(size = 22)) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
   theme(legend.text = element_text(size = 22)) +
   theme(legend.title = element_text(size = 24)) 
 ggsave(here("./visuals/SVCpred_density_bar.png"), SVCpred_density_barplot)

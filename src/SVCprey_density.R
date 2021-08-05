@@ -3,10 +3,10 @@
 ##########
 # This file creates a dataframe outlining the density of 8 RVC focal species in 
 # each session between SVC and transect surveys. The dataframe created is used 
-# to compare average densities of each species between surveys using an ANOVA, 
-# as well as average densities of each species individually using ANOVAs. A 
-# barplot of the average recorded density for each species in SVC and transect 
-# surveys is also created. 
+# to compare average densities of each species between surveys as well as 
+# average densities of each species individually using Kruskal-Wallis one-way 
+# analysis of variance tests. A barplot of the average recorded density for each 
+# species in SVC and transect surveys is also created. 
 ##########
 ##########
 # AUTHOR: Iris M. George
@@ -37,14 +37,16 @@ prey_meta <- read_csv(here("./clean_data/prey_metadata.csv"))
 # filter for SVC focal species
 SVC_data <- filter(SVC_data, species == "white grunt"|
                      species == "bluestriped grunt"|species == "hogfish"|
-                     species == "mutton snapper"|species == "yellowtail snapper"|
+                     species == "mutton snapper"|
+                     species == "yellowtail snapper"|
                      species == "gray snapper"|species == "red grouper"|
-                     species == "black grouper")
+                     species == "black grouper"|species == "lionfish")
 prey_fish <- filter(prey_fish, species == "white grunt"|
                       species == "bluestriped grunt"|species == "hogfish"|
-                      species == "mutton snapper"|species == "yellowtail snapper"|
+                      species == "mutton snapper"|
+                      species == "yellowtail snapper"|
                       species == "gray snapper"|species == "red grouper"|
-                      species == "black grouper")
+                      species == "black grouper"|species == "lionfish")
 
 # select transect species and session columns
 prey_species <- prey_fish[,c(1,3)]
@@ -106,15 +108,15 @@ with(SVCprey_density, shapiro.test(density[survey == "transect"]))
 
 # kruskal-wallis test
 SVCprey_density_kruskal <- kruskal.test(density~survey, data = SVCprey_density)
-# Kruskal-Wallis chi-squared = 6.2476, df = 1, p-value = 0.01244
+# Kruskal-Wallis chi-squared = 4.6297, df = 1, p-value = 0.03142
 
 # average SVC density 
 mean(SVCprey_density$density[SVCprey_density$survey == "SVC"])
-# 0.2035143
+# 0.2007255
 
 # average transect density 
 mean(SVCprey_density$density[SVCprey_density$survey == "transect"])
-# 0.2952237
+# 0.2859671
 
 
 # White Grunt ANOVA ============================================================
@@ -130,7 +132,8 @@ with(white_grunt_density, shapiro.test(density[survey == "SVC"]))
 with(white_grunt_density, shapiro.test(density[survey == "transect"]))
 
 # kruskal-wallis test
-white_grunt_density_kruskal <- kruskal.test(density~survey, data = white_grunt_density)
+white_grunt_density_kruskal <- kruskal.test(density~survey, 
+                               data = white_grunt_density)
 # Kruskal-Wallis chi-squared = 9.1079, df = 1, p-value = 0.002545
 
 # average SVC density 
@@ -156,7 +159,8 @@ with(bluestriped_grunt_density, shapiro.test(density[survey == "SVC"]))
 with(bluestriped_grunt_density, shapiro.test(density[survey == "transect"]))
 
 # kruskal-wallis test
-bluestriped_grunt_density_kruskal <- kruskal.test(density~survey, data = bluestriped_grunt_density)
+bluestriped_grunt_density_kruskal <- kruskal.test(density~survey, 
+                                     data = bluestriped_grunt_density)
 # Kruskal-Wallis chi-squared = 2.8361, df = 1, p-value = 0.09217
 
 
@@ -190,7 +194,8 @@ with(mutton_snapper_density, shapiro.test(density[survey == "SVC"]))
 with(mutton_snapper_density, shapiro.test(density[survey == "transect"]))
 
 # kruskal-wallis test
-mutton_snapper_density_kruskal <- kruskal.test(density~survey, data = mutton_snapper_density)
+mutton_snapper_density_kruskal <- kruskal.test(density~survey, 
+                                  data = mutton_snapper_density)
 # Kruskal-Wallis chi-squared = 0.15633, df = 1, p-value = 0.6926
 
 
@@ -207,7 +212,8 @@ with(gray_snapper_density, shapiro.test(density[survey == "SVC"]))
 with(gray_snapper_density, shapiro.test(density[survey == "transect"]))
 
 # kruskal-wallis test
-gray_snapper_density_kruskal <- kruskal.test(density~survey, data = gray_snapper_density)
+gray_snapper_density_kruskal <- kruskal.test(density~survey, 
+                                data = gray_snapper_density)
 # Kruskal-Wallis chi-squared = 0.065888, df = 1, p-value = 0.7974
 
 
@@ -225,7 +231,8 @@ with(yellowtail_snapper_density, shapiro.test(density[survey == "SVC"]))
 with(yellowtail_snapper_density, shapiro.test(density[survey == "transect"]))
 
 # kruskal-wallis test
-yellowtail_snapper_density_kruskal <- kruskal.test(density~survey, data = yellowtail_snapper_density)
+yellowtail_snapper_density_kruskal <- kruskal.test(density~survey, 
+                                      data = yellowtail_snapper_density)
 # Kruskal-Wallis chi-squared = 0.03663, df = 1, p-value = 0.8482
 
 
@@ -242,7 +249,8 @@ with(red_grouper_density, shapiro.test(density[survey == "SVC"]))
 with(red_grouper_density, shapiro.test(density[survey == "transect"]))
 
 # kruskal-wallis test
-red_grouper_density_kruskal <- kruskal.test(density~survey, data = red_grouper_density)
+red_grouper_density_kruskal <- kruskal.test(density~survey, 
+                               data = red_grouper_density)
 # Kruskal-Wallis chi-squared = 0.12142, df = 1, p-value = 0.7275
 
 
@@ -259,8 +267,27 @@ with(black_grouper_density, shapiro.test(density[survey == "SVC"]))
 with(black_grouper_density, shapiro.test(density[survey == "transect"]))
 
 # kruskal-wallis test
-black_grouper_density_kruskal <- kruskal.test(density~survey, data = black_grouper_density)
+black_grouper_density_kruskal <- kruskal.test(density~survey, 
+                                 data = black_grouper_density)
 # Kruskal-Wallis chi-squared = 0.021821, df = 1, p-value = 0.8826
+
+
+# Lionfish ANOVA ===============================================================
+
+# The following performs an ANOVA on the average density of lionfish 
+# observed between SVC and transect surveys. 
+
+# filter for lionfish
+lionfish_density <- filter(SVCprey_density, species == "lionfish")
+
+# shapiro-wilk normality test
+with(lionfish_density, shapiro.test(density[survey == "SVC"]))
+with(lionfish_density, shapiro.test(density[survey == "transect"]))
+
+# kruskal-wallis test
+lionfish_density_kruskal <- kruskal.test(density~survey, 
+                                              data = lionfish_density)
+# Kruskal-Wallis chi-squared = 2.3846, df = 1, p-value = 0.1225
 
 
 # Density Barplot ==============================================================
@@ -283,11 +310,12 @@ SVCprey_density_barplot <- ggplot(SVCprey_density_bar, aes(x = species,
   geom_bar(position = "dodge", stat = "identity", color = "black") +
   theme_classic() +
   xlab("Species") + 
-  ylab("Average Density") +
-  scale_fill_manual(values = c("lemonchiffon1", "navyblue")) +
+  ylab(bquote("Log Density Difference " (individuals/m^2))) +
+  # scale_fill_manual(values = c("gray88", "gray44")) +
+  scale_fill_brewer(palette = "YlGnBu") +
   theme(axis.title = element_text(size = 24)) +
   theme(axis.text = element_text(size = 22)) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
   theme(legend.text = element_text(size = 22)) +
   theme(legend.title = element_text(size = 24)) 
 ggsave(here("./visuals/SVCprey_density_bar.png"), SVCprey_density_barplot)

@@ -74,7 +74,7 @@ prey_hab <- ggplot(SVCprey_model_data, aes(x = habitat, y = log_difference,
   theme(axis.title = element_text(size = 24)) +
   theme(axis.text= element_text(size = 22)) +
   theme(legend.position = "none") +
-  scale_fill_manual(values = c("lemonchiffon1", "navyblue")) +
+  scale_fill_manual(values = c("gray88", "gray44")) +
   geom_hline(yintercept = 0,
              linetype = "dashed",
              colour = "grey40")
@@ -87,7 +87,7 @@ prey_stony <- ggplot(SVCprey_model_data, aes(x = stony, y = log_difference)) +
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
   theme(axis.title = element_text(size = 24)) +
   theme(axis.text= element_text(size = 22)) +
-  geom_smooth(method=lm, se = FALSE) +
+  geom_smooth(method=lm, color = "gray44", se = FALSE) +
   geom_hline(yintercept = 0,
              linetype = "dashed",
              colour = "grey40")
@@ -101,7 +101,7 @@ prey_octo <- ggplot(SVCprey_model_data, aes(x = octocoral,
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
   theme(axis.title = element_text(size = 24)) +
   theme(axis.text= element_text(size = 22)) +
-  geom_smooth(method=lm, se = FALSE) +
+  geom_smooth(method=lm, color = "gray44", se = FALSE) +
   geom_hline(yintercept = 0,
              linetype = "dashed",
              colour = "grey40")
@@ -116,7 +116,8 @@ prey_cryptic <- ggplot(SVCprey_model_data, aes(x = cryptic_behaviour2,
   theme(axis.title = element_text(size = 24)) +
   theme(axis.text= element_text(size = 22)) +
   theme(legend.position = "none") +
-  scale_fill_manual(values = c("lemonchiffon1", "navyblue")) +
+  scale_fill_brewer(palette = "YlGnBu") +
+  # scale_fill_manual(values = c("gray88", "gray44")) +
   geom_hline(yintercept = 0,
              linetype = "dashed",
              colour = "grey40")
@@ -130,8 +131,8 @@ prey_size <- ggplot(SVCprey_model_data, aes(x = size_bin_char,
   theme_classic() + 
   xlab("Size Bin") + 
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
-  theme(axis.title = element_text(size = 24)) + 
-  theme(axis.text= element_text(size = 22)) + 
+  theme(axis.title = element_text(size = 28)) + 
+  theme(axis.text= element_text(size = 26)) + 
   theme(legend.position = "none") + 
   scale_fill_brewer(palette = "YlGnBu") + 
   geom_hline(yintercept = 0, linetype = "dashed", colour = "grey40")
@@ -164,7 +165,7 @@ prey_behav <- ggplot(SVCprey_model_data, aes(x = behavior, y = log_difference,
   theme(axis.title = element_text(size = 24)) + 
   theme(axis.text= element_text(size = 22)) + 
   theme(legend.position = "none") + 
-  scale_fill_brewer(palette = "YlGnBu") + 
+  scale_fill_brewer(palette = "Greys") + 
   geom_hline(yintercept = 0, linetype = "dashed", colour = "grey40")
 ggsave(here("./visuals/SVCprey_behaviour_box.png"), prey_behav)
 
@@ -176,7 +177,7 @@ prey_max <- ggplot(SVCprey_model_data, aes(x = max_length,
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
   theme(axis.title = element_text(size = 24)) +
   theme(axis.text= element_text(size = 22)) +
-  geom_smooth(method=lm, se = FALSE) +
+  geom_smooth(method=lm, color = "gray44", se = FALSE) +
   geom_hline(yintercept = 0,
              linetype = "dashed",
              colour = "grey40")
@@ -190,10 +191,10 @@ prey_shape <- ggplot(SVCprey_model_data, aes(x = shape, y = log_difference,
   theme_classic() + 
   xlab("Body Shape") + 
   ylab(bquote("Log Density Difference " (individuals/m^2))) +
-  theme(axis.title = element_text(size = 24)) + 
-  theme(axis.text= element_text(size = 22)) + 
+  theme(axis.title = element_text(size = 28)) + 
+  theme(axis.text= element_text(size = 26)) + 
   theme(legend.position = "none") + 
-  scale_fill_brewer(palette = "YlGnBu") + 
+  scale_fill_brewer(palette = "Greys") + 
   geom_hline(yintercept = 0, linetype = "dashed", colour = "grey40")
 ggsave(here("./visuals/SVCprey_shape_box.png"), prey_shape)
 

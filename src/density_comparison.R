@@ -1,12 +1,10 @@
 ########## SURVEY COMPARISON PROJECT DENSITY COMPARISON ##########
 ########## 
 ##########
-# This file creates a dataframe outlining the density of 8 RVC focal species in 
-# each session between SVC and transect surveys. The dataframe created is used 
-# to compare average densities of each species between surveys using an ANOVA, 
-# as well as average densities of each species individually using ANOVAs. A 
-# barplot of the average recorded density for each species in SVC and transect 
-# surveys is also created. 
+# This file creates a dataframe outlining the average densities of reef fish 
+# species between SVC and transect surveys and SVC and roving surveys. The 
+# dataframe created is used to compare average densities of each species between 
+# surveys using a Kruskal-Wallis one way analysis of variance. 
 ##########
 ##########
 # AUTHOR: Iris M. George
@@ -131,22 +129,10 @@ SVCprey_density <- na.omit(SVCprey_density)
 SVCpred_density <- na.omit(SVCpred_density)
 
 
-# SVC vs. Transect Density ANOVA ===============================================
+# SVC vs. Transect Density Comparison ==========================================
 
-# The following performs an ANOVA across all SVC focal species to determine
-# differences in their average densities between survey types.
-
-# one-way ANOVA
-SVCprey_density_anova <- aov(density~survey, SVCprey_density)
-
-# one-way Tukey Test 
-TukeyHSD(SVCprey_density_anova)
-
-# two-way ANOVA
-SVCprey_density_twaov <- aov(density~survey+species, SVCprey_density)
-
-# two-way Tukey Test
-TukeyHSD(SVCprey_density_twaov)
+# The following performs a Kruskal-Wallis test across all species to determine
+# differences in their average densities between SVC and transect surveys.
 
 # shapiro-wilk normality test
 with(SVCprey_density, shapiro.test(density[survey == "SVC"]))
@@ -154,7 +140,7 @@ with(SVCprey_density, shapiro.test(density[survey == "transect"]))
 
 # kruskal-wallis test
 SVCprey_density_kruskal <- kruskal.test(density~survey, data = SVCprey_density)
-SVCprey_density_mann <- wilcox.test(density~survey, data = SVCprey_density)
+# SVCprey_density_mann <- wilcox.test(density~survey, data = SVCprey_density)
 
 # average SVC density 
 mean(SVCprey_density$density[SVCprey_density$survey == "SVC"])
@@ -163,22 +149,11 @@ mean(SVCprey_density$density[SVCprey_density$survey == "SVC"])
 mean(SVCprey_density$density[SVCprey_density$survey == "transect"])
 
 
-# SVC vs. Roving Density ANOVA =================================================
+# SVC vs. Roving Density Comparison ============================================
 
-# The following performs an ANOVA across all SVC focal species to determine
-# differences in their average densities between survey types.
-
-# one-way ANOVA
-SVCpred_density_anova <- aov(density~survey, SVCpred_density)
-
-# one-way Tukey Test 
-TukeyHSD(SVCpred_density_anova)
-
-# two-way ANOVA
-SVCpred_density_twaov <- aov(density~survey+species, SVCpred_density)
-
-# two-way Tukey Test
-TukeyHSD(SVCpred_density_twaov)
+# The following performs a Kruskal-Wallis test across all roving species to 
+# determine differences in their average densities between SVC and roving 
+# surveys.
 
 # shapiro-wilk normality test
 with(SVCpred_density, shapiro.test(density[survey == "SVC"]))
@@ -193,3 +168,9 @@ mean(SVCpred_density$density[SVCpred_density$survey == "SVC"])
 
 # average transect density 
 mean(SVCpred_density$density[SVCpred_density$survey == "roving"])
+
+# lionfish density 
+mean(SVCpred_density$density[SVCpred_density$survey == "SVC" & 
+                               SVCpred_density$species == "lionfish"])
+mean(SVCpred_density$density[SVCpred_density$survey == "roving" & 
+                               SVCpred_density$species == "lionfish"])

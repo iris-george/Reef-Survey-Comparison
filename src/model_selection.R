@@ -22,6 +22,8 @@ library(nlme)
 library(car)
 library(arm)
 library(MuMIn)
+library(data.table)
+library(ggplot2)
 library(here)
 
 # data
@@ -86,17 +88,68 @@ SVCprey_dredge_sub <- subset(SVCprey_dredge, delta < 4)
 
 # model average 
 SVCprey_model_average <- model.avg(SVCprey_dredge_sub)
-summary(SVCprey_model_average)
+SVCprey_model_avg_summary <- summary(SVCprey_model_average)
 
 # save model average
 saveRDS(SVCprey_model_average, here("./outputs/SVCprey_drege_average.rds"))
 
 # confidence intervals of predictors
 SVCprey_confidence <- confint(SVCprey_model_average)
-summary(SVCprey_confidence )
 
 # save confidence intervals
 saveRDS(SVCprey_confidence, here("./outputs/SVCprey_dredge_CI.rds"))
+
+
+# SVC vs. Transect: Model Plot =================================================
+
+# The following creates a visual representation of predictors in the top models
+# comparing SVC and transect survey density differences. Predictor values are 
+# displayed along with their confidence intervals and significance. 
+
+# select conditional coefficient estimates 
+SVCprey_model_avg_plot<-as.data.frame(SVCprey_model_avg_summary$coefmat.subset) 
+
+# select confidence intervals 
+SVCprey_CI <- as.data.frame(confint(SVCprey_model_avg_summary, full=T)) 
+
+# put confidence intervals into coefficient dataframe
+SVCprey_model_avg_plot$CI.min <-SVCprey_CI$`2.5 %` 
+SVCprey_model_avg_plot$CI.max <-SVCprey_CI$`97.5 %`
+
+# put rownames in column
+setDT(SVCprey_model_avg_plot, keep.rownames = "Coefficient") 
+
+# remove spaces from column headers
+names(SVCprey_model_avg_plot) <- gsub(" ", "", names(SVCprey_model_avg_plot)) 
+
+# add binary significance column
+SVCprey_model_avg_plot$significance <- 
+  ifelse(SVCprey_model_avg_plot$`Pr(>|z|)` < 0.05, "sig", "nonsig")
+
+# plot with confidence intervals 
+SVCprey_coef_CI <- ggplot(data=SVCprey_model_avg_plot[2:20,], aes(x=Coefficient, y=Estimate))+ 
+  geom_point(size=5, aes(shape = significance))+ 
+  theme_classic(base_size = 20)+ 
+  scale_shape_manual(values = c(16,8))+
+  geom_errorbar(aes(ymin=CI.min, ymax=CI.max), colour="grey65", 
+                width=.2,lwd=1) +
+  geom_hline(yintercept=0, color = "grey40",linetype="dashed", lwd=1.5)+
+  coord_flip() +
+  theme(legend.position = "none")
+ggsave(here("./visuals/SVCprey_coef_plot_CIs.png"), SVCprey_coef_CI)
+
+# plot with adjusted standard error bars
+SVCprey_coef_SE <- ggplot(data=SVCprey_model_avg_plot[2:20,], aes(x=Coefficient, y=Estimate))+ 
+  geom_point(size=5, aes(shape = significance))+ 
+  theme_classic(base_size = 20)+ 
+  scale_shape_manual(values = c(16,8))+
+  geom_errorbar(aes(ymin=Estimate-AdjustedSE, ymax=Estimate+AdjustedSE), 
+                colour="grey65", 
+                width=.2, lwd=1) +
+  geom_hline(yintercept=0, color = "grey40",linetype="dashed", lwd=1.5)+
+  coord_flip() +
+  theme(legend.position = "none")
+ggsave(here("./visuals/SVCprey_coef_plot_SEs.png"), SVCprey_coef_SE)
 
 
 # SVC vs. Roving: Global Model =================================================
@@ -218,7 +271,7 @@ SVCpred_dredge_sub <- subset(SVCpred_dredge, delta < 4)
 
 # model average 
 SVCpred_model_average <- model.avg(SVCpred_dredge_sub)
-summary(SVCpred_model_average)
+SVCpred_model_avg_summary <- summary(SVCpred_model_average)
 
 # save model average
 saveRDS(SVCpred_model_average, here("./outputs/SVCpred_dredge_average.rds"))
@@ -229,3 +282,55 @@ summary(SVCpred_confidence)
 
 # save confidence intervals
 saveRDS(SVCpred_confidence, here("./outputs/SVCpred_dredge_CI.rds"))
+
+
+# SVC vs. Roving: Model Plot ===================================================
+
+# The following creates a visual representation of predictors in the top models
+# comparing SVC and roving survey density differences. Predictor values are 
+# displayed along with their confidence intervals and significance. 
+
+# select conditional coefficient estimates 
+SVCpred_model_avg_plot<-as.data.frame(SVCpred_model_avg_summary$coefmat.subset) 
+
+# select confidence intervals 
+SVCpred_CI <- as.data.frame(confint(SVCpred_model_avg_summary, full=T)) 
+
+# put confidence intervals into coefficient dataframe
+SVCpred_model_avg_plot$CI.min <-SVCpred_CI$`2.5 %` 
+SVCpred_model_avg_plot$CI.max <-SVCpred_CI$`97.5 %`
+
+# put rownames in column
+setDT(SVCpred_model_avg_plot, keep.rownames = "Coefficient") 
+
+# remove spaces from column headers
+names(SVCpred_model_avg_plot) <- gsub(" ", "", names(SVCpred_model_avg_plot)) 
+
+# add binary significance column
+SVCpred_model_avg_plot$significance <- 
+  ifelse(SVCpred_model_avg_plot$`Pr(>|z|)` < 0.05, "sig", "nonsig")
+
+# plot with confidence intervals 
+SVCpred_coef_CI <- ggplot(data=SVCpred_model_avg_plot[2:4,], aes(x=Coefficient, y=Estimate))+ 
+  geom_point(size=5, aes(shape = significance))+ 
+  theme_classic(base_size = 20)+ 
+  scale_shape_manual(values = c(16,8))+
+  geom_errorbar(aes(ymin=CI.min, ymax=CI.max), colour="grey65", 
+                width=.2,lwd=1) +
+  geom_hline(yintercept=0, color = "grey40",linetype="dashed", lwd=1.5)+
+  coord_flip() +
+  theme(legend.position = "none")
+ggsave(here("./visuals/SVCpred_coef_plot_CIs.png"), SVCpred_coef_CI)
+
+# plot with adjusted standard error bars
+SVCpred_coef_SE <- ggplot(data=SVCpred_model_avg_plot[2:4,], aes(x=Coefficient, y=Estimate))+ 
+  geom_point(size=5, aes(shape = significance))+ 
+  theme_classic(base_size = 20)+ 
+  scale_shape_manual(values = c(16,8))+
+  geom_errorbar(aes(ymin=Estimate-AdjustedSE, ymax=Estimate+AdjustedSE), 
+                colour="grey65", 
+                width=.2, lwd=1) +
+  geom_hline(yintercept=0, color = "grey40",linetype="dashed", lwd=1.5)+
+  coord_flip() +
+  theme(legend.position = "none")
+ggsave(here("./visuals/SVCpred_coef_plot_SEs.png"), SVCpred_coef_SE)

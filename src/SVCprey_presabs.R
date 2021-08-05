@@ -92,9 +92,10 @@ saveRDS(SVCprey_full_chi, here("./outputs/SVCprey_full_chi.rds"))
 
 focal_SVCprey_pres <- filter(SVCprey_presence, species == "white grunt"|
                       species == "bluestriped grunt"|species == "hogfish"|
-                      species == "mutton snapper"|species == "yellowtail snapper"|
-                      species == "gray snapper"|species == "red grouper"|
-                      species == "black grouper")
+                      species == "mutton snapper"|
+                      species == "yellowtail snapper"|species == "gray snapper"|
+                      species == "red grouper"|species == "black grouper"|
+                        species == "lionfish")
 
 # convert dataframe to table
 focal_SVCprey_chi <- table(focal_SVCprey_pres$species, 
@@ -498,13 +499,60 @@ black_grouper_result <- chisq.test(black_grouper_chi)
 saveRDS(black_grouper_result, here("./outputs/black_grouper_chi.rds"))
 
 
+# Chi-Square Test: Lionfish ====================================================
+
+# The following performs a Chi-Square test on presence/absence recordings of 
+# lionfish across sessions between SVC and transect surveys. 
+
+# add species column for lionfish
+lionfish <- prey_sessions
+lionfish$species <- "lionfish"
+
+# add presence column
+SVC_fish$SVC_presence <- 1
+prey_fish$prey_presence <- 1
+
+# join lionfish presence values to each session
+lionfish_SVC <- join(lionfish, SVC_fish, by = NULL, 
+                          type = "left", match = "first")
+lionfish_prey <- join(lionfish, prey_fish, by = NULL, 
+                           type = "left", match = "first")
+
+# add survey column
+lionfish_SVC$survey <- "SVC"
+lionfish_prey$survey <- "prey"
+
+# rename columns
+lionfish_SVC <- rename(lionfish_SVC, presence = SVC_presence)
+lionfish_prey <- rename(lionfish_prey, 
+                             presence = prey_presence)
+
+# bind
+lionfish_chi <- bind_rows(lionfish_SVC, 
+                               lionfish_prey)
+
+# replace NA values with 0
+lionfish_chi[is.na(lionfish_chi)] <- 0
+
+# convert to table
+lionfish_chi <- table(lionfish_chi$presence, 
+                           lionfish_chi$survey)
+
+# chi-square test
+lionfish_result <- chisq.test(lionfish_chi) 
+# X-squared = 1.6804, df = 1, p-value = 0.1949
+
+# save chi-square results
+saveRDS(lionfish_result, here("./outputs/lionfish_chi.rds"))
+
+
 # Barplot ======================================================================
 
 # The following creates a barplot of the number of sessions each species was 
 # recorded in between SVC and transect surveys. 
 
 # aggregate presence by sum
-SVCprey_presence_bar <- aggregate(.~species+survey, SVCprey_presence, sum)
+SVCprey_presence_bar <- aggregate(.~species+survey, focal_SVCprey_pres, sum)
 
 # sort by species
 SVCprey_presence_bar <- 
@@ -517,10 +565,11 @@ SVCprey_presabs_bar <- ggplot(SVCprey_presence_bar, aes(x = species,
   theme_classic() +
   xlab("Species") + 
   ylab("Number of Sessions Present") +
-  scale_fill_manual(values = c("lemonchiffon1", "navyblue")) +
+  # scale_fill_manual(values = c("gray88", "gray44")) +
+  scale_fill_brewer(palette = "YlGnBu") +
   theme(axis.title = element_text(size = 24)) +
   theme(axis.text = element_text(size = 22)) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
   theme(legend.text = element_text(size = 22)) +
   theme(legend.title = element_text(size = 24)) 
 ggsave(here("./visuals/SVCprey_presabs_bar.png"), SVCprey_presabs_bar)

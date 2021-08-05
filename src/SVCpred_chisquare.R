@@ -25,6 +25,7 @@ library(plyr)
 library(tidyverse)
 library(ggplot2)
 library(here)
+library(agricolae)
 
 # data
 SVC_fish_data <- read_csv(here("./clean_data/SVC_data.csv"))
@@ -40,7 +41,7 @@ traits <- read_csv(here("./clean_data/fish_traits.csv"))
 # extract SVC observations
 SVC_fish <- SVC_fish_data[,c(1,37)]
 
-# extract roving observations 
+# extract pred observations 
 pred_fish <- pred_fish_data[,c(1,3)]
 
 # remove sessions with un-matched dates between surveys
@@ -51,7 +52,7 @@ pred_fish <- pred_fish[pred_fish$session !=178,]
 pred_fish <- pred_fish[pred_fish$session !=179,]
 pred_fish <- pred_fish[pred_fish$session !=180,]
 
-# remove sessions with no roving data
+# remove sessions with no pred data
 SVC_fish <- SVC_fish[SVC_fish$session !=264,]
 SVC_fish <- SVC_fish[SVC_fish$session !=265,]
 SVC_fish <- SVC_fish[SVC_fish$session !=266,]
@@ -111,42 +112,52 @@ SVC_presence$survey <- "SVC"
 pred_presence$survey <- "roving"
 
 # bind SVC and roving presence values together 
-SVCroving_presence <- bind_rows(SVC_presence, pred_presence)
+SVCpred_presence <- bind_rows(SVC_presence, pred_presence)
 
 # take out 0 rows
-SVCroving_presence <- SVCroving_presence[SVCroving_presence$presence !=0,]
+SVCpred_presence <- SVCpred_presence[SVCpred_presence$presence !=0,]
 
 
 # Full Chi-Square Test =========================================================
 
 # The following performs a Chi-Square Test on the number of sessions present
-# across species between SVC and roving surveys to determine if an overall
+# across species between SVC and pred surveys to determine if an overall
 # significant difference between survey types exists.
 
 # convert dataframe to table
-SVCroving_chi <- table(SVCroving_presence$species, 
-                       SVCroving_presence$survey)
+SVCpred_chi <- table(SVCpred_presence$species, 
+                       SVCpred_presence$survey)
 
 # Chi-Square Test
-SVCroving_full_chi <- chisq.test(SVCroving_chi)
+SVCpred_full_chi <- chisq.test(SVCpred_chi)
 
 # save Chi-Square results
-saveRDS(SVCroving_full_chi, here("./outputs/SVCpred_full_chi.rds"))
+saveRDS(SVCpred_full_chi, here("./outputs/SVCpred_full_chi.rds"))
 
 
 # Focal Chi-Square Test ========================================================
 
 # filter for focal species
-focal_SVCroving_pres <- filter(SVCroving_presence, species == "mutton snapper"|
+focal_SVCpred_pres <- filter(SVCpred_presence, species == "mutton snapper"|
                                  species == "red grouper"|
-                                 species == "black grouper")
+                                 species == "black grouper"|
+                                 species == "lionfish")
 
 # convert dataframe to table
-focal_SVCroving_chi <- table(focal_SVCroving_pres$species, 
-                       focal_SVCroving_pres$survey)
+focal_SVCpred_chi <- table(focal_SVCpred_pres$species, 
+                       focal_SVCpred_pres$survey)
 
 # Chi-Square Test
-SVCroving_focal_chi <- chisq.test(focal_SVCroving_chi)
+SVCpred_focal_chi <- chisq.test(focal_SVCpred_chi)
+round(SVCpred_focal_chi$expected,2)
+
+# kruskal-wallis
+kruskal.test(presence~survey, data = focal_SVCpred_pres)
+
+# ANOVA
+focal_SVCpred_aov <- aov(presence~survey, data = focal_SVCpred_pres)
+TukeyHSD(focal_SVCpred_aov)
+LSD_focal_SVCpred <- LSD.test(focal_SVCpred_aov, "survey")
 
 
 # Chi-Square Test: Black Grouper ===============================================
@@ -157,10 +168,10 @@ SVCroving_focal_chi <- chisq.test(focal_SVCroving_chi)
 # extract SVC observations
 SVC_fish <- SVC_fish_data[,c(1,37)]
 
-# extract roving observations 
+# extract pred observations 
 pred_fish <- pred_fish_data[,c(1,3)]
 
-# extract roving sessions
+# extract pred sessions
 pred_sessions <- pred_fish[,1]
 
 # remove duplicate sessions 
@@ -299,13 +310,58 @@ mutton_snapper_result <- chisq.test(mutton_snapper_chi)
 saveRDS(mutton_snapper_result, here("./outputs/mutton_snapper_chi.rds"))
 
 
+# Chi-Square Test: Lionfish ====================================================
+
+# The following performs a Chi-Square test on presence/absence recordings of 
+# lionfish across sessions between SVC and roving surveys. 
+
+# add species column for lionfish
+lionfish <- pred_sessions
+lionfish$species <- "lionfish"
+
+# add presence column
+SVC_fish$SVC_presence <- 1
+pred_fish$pred_presence <- 1
+
+# join lionfish presence values to each session
+lionfish_SVC <- join(lionfish, SVC_fish, by = NULL, type = "left", 
+                           match = "first")
+lionfish_pred <- join(lionfish, pred_fish, by = NULL, type = "left", 
+                            match = "first")
+
+# add survey column
+lionfish_SVC$survey <- "SVC"
+lionfish_pred$survey <- "roving"
+
+# rename columns
+lionfish_SVC <- rename(lionfish_SVC, presence = SVC_presence)
+lionfish_pred <- rename(lionfish_pred, presence = pred_presence)
+
+# bind
+lionfish_chi <- bind_rows(lionfish_SVC, lionfish_pred)
+
+# replace NA values with 0
+lionfish_chi[is.na(lionfish_chi)] <- 0
+
+# convert to table
+lionfish_chi <- table(lionfish_chi$presence, 
+                            lionfish_chi$survey)
+
+# chi-square test
+lionfish_result <- chisq.test(lionfish_chi) 
+# X-squared = 26.031, df = 1, p-value = 3.36e-07
+
+# save chi-square results
+saveRDS(lionfish_result, here("./outputs/lionfish_chi.rds"))
+
+
 # Barplot ======================================================================
 
 # The following creates a barplot of the number of sessions each species was 
 # recorded in between SVC and roving surveys. 
 
 # re-order species
-SVCroving_presence$species <- factor(SVCroving_presence$species, 
+SVCpred_presence$species <- factor(SVCpred_presence$species, 
                               levels = c("goldentail moray", "green moray", 
                               "purplemouth moray", "spotted moray", 
                               "sharptail eel", "amberjack", "black grouper", 
@@ -317,7 +373,7 @@ SVCroving_presence$species <- factor(SVCroving_presence$species,
                               "spotted scorpionfish", "trumpetfish"))
 
 # aggregate presence by sum
-SVCroving_presence_bar <- aggregate(.~species+survey, SVCroving_presence, sum)
+SVCpred_presence_bar <- aggregate(.~species+survey, SVCpred_presence, sum)
 
 # add 0 species
 goldentail_SVC <- data.frame("goldentail moray", "SVC", 0)
@@ -338,17 +394,17 @@ scamp_SVC <- data.frame("scamp", "SVC", 0)
 names(scamp_SVC) <- c("species", "survey", "presence")
 cubera_SVC <- data.frame("cubera snapper", "SVC", 0)
 names(cubera_SVC) <- c("species", "survey", "presence")
-SVCroving_presence_bar <- rbind(SVCroving_presence_bar, goldentail_SVC, 
+SVCpred_presence_bar <- rbind(SVCpred_presence_bar, goldentail_SVC, 
                                 purplemouth_SVC, sharptail_SVC, amberjack_SVC, 
                                 nassau_SVC, redhind_SVC, soapfish_SVC, 
                                 scamp_SVC, cubera_SVC)
 
 # sort by species
-SVCroving_presence_bar <- 
-  SVCroving_presence_bar[order(SVCroving_presence_bar$species),]
+SVCpred_presence_bar <- 
+  SVCpred_presence_bar[order(SVCpred_presence_bar$species),]
 
 # barplot
-SVCpred_presabs_bar <- ggplot(SVCroving_presence_bar, aes(x = species, 
+SVCpred_presabs_bar <- ggplot(SVCpred_presence_bar, aes(x = species, 
                        y = presence, fill = survey)) +
   geom_bar(position = "dodge", stat = "identity", color = "black") +
   theme_classic() +
@@ -358,6 +414,37 @@ SVCpred_presabs_bar <- ggplot(SVCroving_presence_bar, aes(x = species,
   theme(axis.title = element_text(size = 24)) +
   theme(axis.text = element_text(size = 22)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  theme(legend.text = element_text(size = 22)) +
+  theme(legend.title = element_text(size = 24)) 
+ggsave(here("./visuals/SVCpred_presabs_bar.png"), SVCpred_presabs_bar)
+
+
+# Focal Species Barplot ========================================================
+
+# aggregate presence by sum
+SVCpred_presence_focal <- aggregate(.~species+survey, focal_SVCpred_pres, 
+                                      sum)
+
+# sort by species
+SVCpred_presence_focal <- 
+  SVCpred_presence_focal[order(SVCpred_presence_focal$species),]
+
+# re-order surveys
+SVCpred_presence_focal$survey <- factor(SVCpred_presence_focal$survey, 
+                                     levels = c("SVC", "roving"))
+
+# barplot
+SVCpred_presabs_bar <- ggplot(SVCpred_presence_focal, aes(x = species, 
+                       y = presence, fill = survey)) +
+  geom_bar(position = "dodge", stat = "identity", color = "black") +
+  theme_classic() +
+  xlab("Species") + 
+  ylab("Number of Sessions Present") +
+  # scale_fill_manual(values = c("gray88", "gray44")) +
+  scale_fill_brewer(palette = "YlGnBu") +
+  theme(axis.title = element_text(size = 24)) +
+  theme(axis.text = element_text(size = 22)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
   theme(legend.text = element_text(size = 22)) +
   theme(legend.title = element_text(size = 24)) 
 ggsave(here("./visuals/SVCpred_presabs_bar.png"), SVCpred_presabs_bar)
